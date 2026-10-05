@@ -1,5 +1,6 @@
-package com.example.rinno_app
+package br.com.rinnovare.app
 
 import io.flutter.embedding.android.FlutterActivity
 
 class MainActivity : FlutterActivity()
+

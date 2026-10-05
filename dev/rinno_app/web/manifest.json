@@ -1,12 +1,12 @@
 {
-    "name": "rinno_app",
-    "short_name": "rinno_app",
+    "name": "Rinnovare",
+    "short_name": "Rinnovare",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
-    "orientation": "portrait-primary",
+    "background_color": "#0B132B",
+    "theme_color": "#0B132B",
+    "description": "Acompanhe sua instalação solar Rinnovare.",
+    "orientation": "any",
     "prefer_related_applications": false,
     "icons": [
         {
@@ -33,3 +33,4 @@
         }
     ]
 }
+
