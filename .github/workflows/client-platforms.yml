@@ -3,7 +3,7 @@ on:
   pull_request:
     paths: ['dev/rinno_app/**', '.github/workflows/client-platforms.yml']
   push:
-    branches: [codex/client-portal]
+    branches: [main]
   workflow_dispatch:
 permissions:
   contents: read
@@ -41,8 +41,11 @@ jobs:
       - run: flutter pub get
       - run: flutter test
       - run: ${{ matrix.command }} --dart-define=API_BASE_URL=https://api.rinnovare.com.br/api/v1/app
+      - name: Preserve Unix executable permissions and links
+        if: matrix.target == 'linux' || matrix.target == 'macos' || matrix.target == 'ios'
+        run: tar -czf build/rinnovare-${{ matrix.target }}.tar.gz -C "${{ matrix.artifact }}" .
       - uses: actions/upload-artifact@v4
         with:
           name: rinnovare-${{ matrix.target }}
-          path: dev/rinno_app/${{ matrix.artifact }}
+          path: dev/rinno_app/${{ (matrix.target == 'linux' || matrix.target == 'macos' || matrix.target == 'ios') && format('build/rinnovare-{0}.tar.gz', matrix.target) || matrix.artifact }}
           if-no-files-found: error

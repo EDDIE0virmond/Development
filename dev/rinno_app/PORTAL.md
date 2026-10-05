@@ -29,6 +29,8 @@ O workflow `.github/workflows/client-platforms.yml` testa e compila cada alvo em
 
 Para assinar Android, crie `android/key.properties` localmente com `storeFile` (caminho absoluto), `storePassword`, `keyAlias` e `keyPassword`. O arquivo e os keystores são ignorados pelo Git. Release nunca utiliza automaticamente a chave debug; sem a configuração, o artefato não estará assinado para distribuição.
 
+Os artefatos Linux/macOS/iOS contêm um `.tar.gz` dentro do ZIP do GitHub para preservar permissões de execução e links. Extraia primeiro o ZIP, depois o tar (`tar -xzf arquivo.tar.gz`). Windows deve manter o executável junto das DLLs e da pasta `data`; não copiar apenas o `.exe`.
+
 ## Sessão e recuperação
 
 Na Web o refresh token fica em cookie HttpOnly do backend; o aplicativo não o salva em localStorage. Nos aplicativos nativos ele fica no armazenamento seguro do sistema. O access token vive somente em memória. Requisições concorrentes compartilham uma renovação de sessão; logout invalida respostas pendentes. macOS usa o Keychain tradicional sem exigir grupo compartilhado; iOS inclui os entitlements do plugin. Android desativa backup para evitar restauração de material criptográfico incompatível.
