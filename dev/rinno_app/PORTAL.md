@@ -39,6 +39,10 @@ A recuperação de senha abre o portal Web configurado em `APP_RECOVERY_URL`, co
 
 ## Implantação coordenada
 
+Domínios definidos: `https://app.cliente.rinnovare.com.br` para o portal e `https://senha.cliente.rinnovare.com.br` para recuperação. Para o segundo, compile com `flutter build web --release --dart-define=PORTAL_RECOVERY_ONLY=true`; esse build abre a recuperação sem restaurar a sessão nem mostrar instalações e oferece retorno ao domínio do app. Links de redefinição usam `?token_hash=...`. Publique cada build na raiz do seu próprio subdomínio.
+
+Na API, as duas origens HTTPS exatas devem constar em `APP_ALLOWED_ORIGINS`, e `APP_RECOVERY_URL=https://senha.cliente.rinnovare.com.br/`. Ative a recuperação somente após DNS/HTTPS, allowlist de redirecionamentos e template condicional no Supabase estarem configurados. Preserve as URLs dos CRMs existentes.
+
 Primeiro prepare a API e a migração descritas em `RinnoTech/api/docs/app-portal.md`, configure a origem real, o template de recuperação e vincule as contas autorizadas. Depois publique `build/web` ou distribua os binários assinados. Sem esse preparo, o frontend não inventa dados: informa indisponibilidade ou ausência de instalações. A migração não altera nem publica automaticamente registros existentes.
 
 Paleta: azul `#0B132B`, verde `#58E514`, verde escuro `#3F7F25`; vidro translúcido, listas sem blur por item e layout adaptável. Texto ampliado e teclado são suportados; não há animação contínua.

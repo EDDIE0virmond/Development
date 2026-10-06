@@ -3,9 +3,45 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:http/testing.dart';
 import 'package:rinno_app/main.dart';
 import 'package:rinno_app/core/network/app_api.dart';
+import 'package:rinno_app/features/portal/client_portal.dart';
 import 'app_api_test.dart' show MemoryStore, jsonResponse, session;
 
 void main() {
+  testWidgets(
+    'recovery site opens email recovery without restoring a session',
+    (tester) async {
+      var requests = 0;
+      final store = MemoryStore();
+      final api = AppApi(
+        store: store,
+        client: MockClient((r) async {
+          requests++;
+          expect(r.url.path.endsWith('/auth/recover'), isTrue);
+          return jsonResponse({});
+        }),
+      );
+      await tester.pumpWidget(
+        MaterialApp(home: ClientPortal(api: api, recoveryOnly: true)),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Vamos recuperar seu acesso.'), findsOneWidget);
+      expect(find.text('Senha'), findsNothing);
+      expect(find.text('Voltar ao aplicativo'), findsOneWidget);
+      expect(find.text('Voltar para entrar'), findsNothing);
+      expect(requests, 0);
+      await tester.enterText(find.byType(TextFormField), 'ana@example.test');
+      await tester.ensureVisible(find.text('Enviar instruções'));
+      await tester.tap(find.text('Enviar instruções'));
+      await tester.pumpAndSettle();
+      expect(requests, 1);
+      expect(
+        find.textContaining('você receberá as instruções'),
+        findsOneWidget,
+      );
+      await tester.pumpWidget(const SizedBox());
+      api.dispose();
+    },
+  );
   testWidgets('client can open installation stages and published documents', (
     tester,
   ) async {

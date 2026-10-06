@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../core/network/app_api.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/theme/widgets/glass_surface.dart';
@@ -6,7 +7,12 @@ import 'client_home_page.dart';
 
 class ClientPortal extends StatefulWidget {
   final AppApi api;
-  const ClientPortal({super.key, required this.api});
+  final bool recoveryOnly;
+  const ClientPortal({
+    super.key,
+    required this.api,
+    this.recoveryOnly = const bool.fromEnvironment('PORTAL_RECOVERY_ONLY'),
+  });
   @override
   State<ClientPortal> createState() => _ClientPortalState();
 }
@@ -23,7 +29,9 @@ class _ClientPortalState extends State<ClientPortal> {
 
   Future<void> _restore() async {
     try {
-      if (widget.api.user == null && tokenHash == null) {
+      if (!widget.recoveryOnly &&
+          widget.api.user == null &&
+          tokenHash == null) {
         await widget.api.restore();
       }
     } catch (e) {
@@ -41,10 +49,12 @@ class _ClientPortalState extends State<ClientPortal> {
             ? const Center(child: CircularProgressIndicator())
             : AnimatedBuilder(
                 animation: widget.api,
-                builder: (context, _) => widget.api.user == null
+                builder: (context, _) =>
+                    widget.recoveryOnly || widget.api.user == null
                     ? _Login(
                         api: widget.api,
                         tokenHash: tokenHash,
+                        recoveryOnly: widget.recoveryOnly,
                         initialError: restoreError,
                       )
                     : ClientHomePage(
@@ -60,7 +70,13 @@ class _ClientPortalState extends State<ClientPortal> {
 class _Login extends StatefulWidget {
   final AppApi api;
   final String? tokenHash, initialError;
-  const _Login({required this.api, this.tokenHash, this.initialError});
+  final bool recoveryOnly;
+  const _Login({
+    required this.api,
+    this.tokenHash,
+    this.initialError,
+    this.recoveryOnly = false,
+  });
   @override
   State<_Login> createState() => _LoginState();
 }
@@ -69,7 +85,11 @@ class _LoginState extends State<_Login> {
   final form = GlobalKey<FormState>();
   final email = TextEditingController(), password = TextEditingController();
   bool busy = false, hidden = true;
-  late String mode = widget.tokenHash != null ? 'reset' : 'login';
+  late String mode = widget.tokenHash != null
+      ? 'reset'
+      : widget.recoveryOnly
+      ? 'recover'
+      : 'login';
   late String? message = widget.initialError;
   bool success = false;
   @override
@@ -94,9 +114,11 @@ class _LoginState extends State<_Login> {
         success = true;
       } else if (mode == 'reset') {
         await widget.api.reset(widget.tokenHash!, password.text);
-        mode = 'login';
+        mode = widget.recoveryOnly ? 'recover' : 'login';
         password.clear();
-        message = 'Senha atualizada. Entre com a nova senha.';
+        message = widget.recoveryOnly
+            ? 'Senha atualizada. Volte ao aplicativo e entre com a nova senha.'
+            : 'Senha atualizada. Entre com a nova senha.';
         success = true;
       } else {
         await widget.api.login(email.text, password.text);
@@ -250,11 +272,28 @@ class _LoginState extends State<_Login> {
                   TextButton(
                     onPressed: busy
                         ? null
+                        : widget.recoveryOnly
+                        ? () async {
+                            final opened = await launchUrl(
+                              Uri.parse('https://app.cliente.rinnovare.com.br'),
+                              webOnlyWindowName: '_self',
+                            );
+                            if (!opened && mounted) {
+                              setState(
+                                () => message =
+                                    'Abra app.cliente.rinnovare.com.br para entrar.',
+                              );
+                            }
+                          }
                         : () => setState(() {
                             mode = 'login';
                             message = null;
                           }),
-                    child: const Text('Voltar para entrar'),
+                    child: Text(
+                      widget.recoveryOnly
+                          ? 'Voltar ao aplicativo'
+                          : 'Voltar para entrar',
+                    ),
                   ),
                 const SizedBox(height: 28),
                 const Divider(),
