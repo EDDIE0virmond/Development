@@ -22,8 +22,8 @@ class GlassSurface extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Colors.white.withValues(alpha: .105),
-            Colors.white.withValues(alpha: .035),
+            const Color(0xFF132C40).withValues(alpha: .91),
+            const Color(0xFF0B192B).withValues(alpha: .82),
           ],
         ),
         border: Border.all(color: Colors.white.withValues(alpha: .16)),
@@ -34,7 +34,7 @@ class GlassSurface extends StatelessWidget {
       borderRadius: BorderRadius.circular(26),
       child: blur
           ? BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+              filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
               child: content,
             )
           : content,
@@ -46,16 +46,35 @@ class PortalBackground extends StatelessWidget {
   final Widget child;
   const PortalBackground({super.key, required this.child});
   @override
-  Widget build(BuildContext context) => DecoratedBox(
-    decoration: const BoxDecoration(
-      gradient: RadialGradient(
-        center: Alignment(.95, -.9),
-        radius: 1.6,
-        colors: [Color(0xFF254C40), Color(0xFF102534), AppTheme.navy],
-        stops: [0, .32, 1],
+  Widget build(BuildContext context) => Stack(
+    fit: StackFit.expand,
+    children: [
+      const ColoredBox(color: AppTheme.navy),
+      Positioned.fill(
+        child: ExcludeSemantics(
+          child: Image.asset(
+            'assets/solar.png',
+            fit: BoxFit.cover,
+            alignment: const Alignment(.35, .2),
+            cacheWidth: 1600,
+            errorBuilder: (_, _, _) => const SizedBox.shrink(),
+          ),
+        ),
       ),
-    ),
-    child: child,
+      const Positioned.fill(
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Color(0xD90B132B), Color(0x70132C40), Color(0xE60B132B)],
+              stops: [0, .5, 1],
+            ),
+          ),
+        ),
+      ),
+      child,
+    ],
   );
 }
 

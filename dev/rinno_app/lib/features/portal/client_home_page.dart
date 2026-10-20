@@ -1,3 +1,4 @@
+import 'client_monitoring.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../core/models/installation.dart';
@@ -16,6 +17,7 @@ class _ClientHomePageState extends State<ClientHomePage> {
   late Future<InstallationPage> page = widget.api.installations();
   final List<Installation> previous = [];
   String? selected;
+  bool showMonitoring = false;
 
   Future<void> logout() async {
     final messenger = ScaffoldMessenger.of(context);
@@ -97,8 +99,34 @@ class _ClientHomePageState extends State<ClientHomePage> {
                   ],
                 ),
               ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(24, 0, 24, 12),
+                child: Wrap(
+                  spacing: 12,
+                  runSpacing: 8,
+                  children: [
+                    ChoiceChip(
+                      label: const Text('Instalações'),
+                      avatar: const Icon(Icons.solar_power_outlined, size: 18),
+                      selected: !showMonitoring,
+                      onSelected: (_) => setState(() {
+                        showMonitoring = false;
+                        selected = null;
+                      }),
+                    ),
+                    ChoiceChip(
+                      label: const Text('Monitoramento'),
+                      avatar: const Icon(Icons.insights_outlined, size: 18),
+                      selected: showMonitoring,
+                      onSelected: (_) => setState(() => showMonitoring = true),
+                    ),
+                  ],
+                ),
+              ),
               Expanded(
-                child: selected != null
+                child: showMonitoring
+                    ? ClientMonitoring(api: widget.api)
+                    : selected != null
                     ? _Detail(
                         key: ValueKey(selected),
                         api: widget.api,
@@ -108,7 +136,8 @@ class _ClientHomePageState extends State<ClientHomePage> {
                     : FutureBuilder<InstallationPage>(
                         future: page,
                         builder: (context, snapshot) {
-                          if (snapshot.connectionState != ConnectionState.done) {
+                          if (snapshot.connectionState !=
+                              ConnectionState.done) {
                             return const Center(
                               child: CircularProgressIndicator(),
                             );
@@ -624,4 +653,3 @@ class _Metric extends StatelessWidget {
     ],
   );
 }
-

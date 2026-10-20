@@ -318,6 +318,17 @@ class AppApi extends ChangeNotifier {
               as List)
           .map((v) => ClientDocument.fromJson(v))
           .toList();
+  Future<List<Map<String, dynamic>>> monitorings() async =>
+      ((await _send('GET', '/monitoring', authenticated: true))['items']
+              as List)
+          .map((e) => Map<String, dynamic>.from(e as Map))
+          .toList();
+  Future<Map<String, dynamic>> monitoringEnergy(String id) => _send(
+    'GET',
+    '/monitoring/${Uri.encodeComponent(id)}/energy',
+    authenticated: true,
+  );
+
   Future<Uri> download(String id) async {
     final result = await _send(
       'GET',
