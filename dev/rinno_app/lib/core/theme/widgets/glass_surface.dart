@@ -81,18 +81,55 @@ class PortalBackground extends StatelessWidget {
 class BrandMark extends StatelessWidget {
   final bool compact;
   const BrandMark({super.key, this.compact = false});
+
   @override
-  Widget build(BuildContext context) => Container(
+  Widget build(BuildContext context) => ConstrainedBox(
     constraints: BoxConstraints(maxWidth: compact ? 210 : 260),
-    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(12),
-    ),
-    child: Image.asset(
-      'assets/rinnovare-wordmark.webp',
-      fit: BoxFit.contain,
-      semanticLabel: 'Rinnovare Solar Engenharia',
+    child: Stack(
+      children: [
+        Positioned.fill(
+          child: ExcludeSemantics(
+            child: ImageFiltered(
+              imageFilter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
+              child: Image.asset(
+                'assets/rinnovare-wordmark.webp',
+                fit: BoxFit.contain,
+                color: const Color(0x99000000),
+              ),
+            ),
+          ),
+        ),
+        ColorFiltered(
+          // Light lettering while retaining the green brand accents and alpha.
+          colorFilter: const ColorFilter.matrix([
+            1,
+            -1,
+            0,
+            0,
+            255,
+            0,
+            0,
+            0,
+            0,
+            255,
+            0,
+            -1,
+            1,
+            0,
+            255,
+            0,
+            0,
+            0,
+            1,
+            0,
+          ]),
+          child: Image.asset(
+            'assets/rinnovare-wordmark.webp',
+            fit: BoxFit.contain,
+            semanticLabel: 'Rinnovare Solar Engenharia',
+          ),
+        ),
+      ],
     ),
   );
 }
