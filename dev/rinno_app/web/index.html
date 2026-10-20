@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
   <!--
     If you are serving your web app in a path other than the root, change the
@@ -31,8 +31,33 @@
 
   <title>Rinnovare</title>
   <link rel="manifest" href="manifest.json">
+  <style>
+    html,body { margin:0; background:#0b132b; }
+    #app-loading { position:fixed; inset:0; display:grid; place-items:center; color:#fff;
+      background:linear-gradient(135deg,#0b132bd9,#132c4070,#0b132be6),url('assets/assets/solar.png') center/cover; font:13px system-ui,sans-serif; }
+    .loading-content { width:min(260px,70vw); text-align:center; animation:reveal .65s cubic-bezier(.22,1,.36,1) both; }
+    .loading-symbol { width:min(200px,50vw); height:auto; filter:drop-shadow(0 3px 10px #0005); }
+    .loading-track { height:4px; margin-top:32px; background:#ffffff30; border-radius:8px; overflow:hidden; }
+    .loading-track::after { content:''; display:block; height:100%; width:40%; border-radius:8px; background:#58e514; animation:progress 1.4s ease-in-out infinite; }
+    .loading-content p { margin-top:18px; color:#ffffffb3; }
+    @keyframes progress { from { transform:translateX(-110%); } to { transform:translateX(350%); } }
+    @keyframes reveal { from { opacity:0; transform:scale(.94); } to { opacity:1; transform:scale(1); } }
+    @media(prefers-reduced-motion:reduce) { .loading-content,.loading-track::after { animation:none; } }
+  </style>
 </head>
 <body>
+  <div id="app-loading" role="status" aria-label="Carregando aplicativo">
+    <div class="loading-content">
+      <img class="loading-symbol" src="rinnovare-symbol.png" alt="Rinnovare" width="200" height="200">
+      <div class="loading-track" aria-hidden="true"></div>
+      <p>Carregando sua energia…</p>
+    </div>
+  </div>
+  <script>
+    window.addEventListener('flutter-first-frame', function () {
+      document.getElementById('app-loading')?.remove();
+    }, { once: true });
+  </script>
   <!--
     You can customize the "flutter_bootstrap.js" script.
     This is useful to provide a custom configuration to the Flutter loader
@@ -41,6 +66,6 @@
     For more details:
     * https://docs.flutter.dev/platform-integration/web/initialization
   -->
-  <script src="flutter_bootstrap.js?v=brand-transparent-20261020" async></script>
+  <script src="flutter_bootstrap.js?v=loading-20261020" async></script>
 </body>
 </html>

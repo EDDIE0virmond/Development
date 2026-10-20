@@ -46,7 +46,7 @@ class _ClientPortalState extends State<ClientPortal> {
       backgroundColor: Colors.transparent,
       body: SafeArea(
         child: restoring
-            ? const Center(child: CircularProgressIndicator())
+            ? const PortalLoading()
             : AnimatedBuilder(
                 animation: widget.api,
                 builder: (context, _) =>
