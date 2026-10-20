@@ -82,48 +82,17 @@ class BrandMark extends StatelessWidget {
   final bool compact;
   const BrandMark({super.key, this.compact = false});
   @override
-  Widget build(BuildContext context) => Row(
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      Container(
-        width: 38,
-        height: 38,
-        decoration: BoxDecoration(
-          color: AppTheme.lime,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: const Icon(
-          Icons.solar_power_outlined,
-          color: AppTheme.navy,
-          size: 25,
-        ),
-      ),
-      const SizedBox(width: 12),
-      Flexible(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text(
-              'rinnovare',
-              style: TextStyle(
-                fontSize: 23,
-                letterSpacing: -.8,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            if (!compact)
-              const Text(
-                'ENGENHARIA SOLAR',
-                style: TextStyle(
-                  fontSize: 8,
-                  letterSpacing: 2.5,
-                  color: AppTheme.muted,
-                ),
-              ),
-          ],
-        ),
-      ),
-    ],
+  Widget build(BuildContext context) => Container(
+    constraints: BoxConstraints(maxWidth: compact ? 210 : 260),
+    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(12),
+    ),
+    child: Image.asset(
+      'assets/rinnovare-wordmark.webp',
+      fit: BoxFit.contain,
+      semanticLabel: 'Rinnovare Solar Engenharia',
+    ),
   );
 }
