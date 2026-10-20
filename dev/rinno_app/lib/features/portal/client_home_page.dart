@@ -52,11 +52,14 @@ class _ClientHomePageState extends State<ClientHomePage> {
                   ),
                   const SizedBox(height: 16),
                   ListTile(
-                    selected: true,
+                    selected: !showMonitoring,
                     selectedColor: AppTheme.lime,
                     leading: const Icon(Icons.solar_power_outlined),
                     title: const Text('Instalações'),
-                    onTap: () => setState(() => selected = null),
+                    onTap: () => setState(() {
+                      selected = null;
+                      showMonitoring = false;
+                    }),
                   ),
                   const Spacer(),
                   const Text(
