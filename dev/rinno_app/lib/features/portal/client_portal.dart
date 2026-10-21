@@ -84,6 +84,7 @@ class _Login extends StatefulWidget {
 class _LoginState extends State<_Login> {
   final form = GlobalKey<FormState>();
   final email = TextEditingController(), password = TextEditingController();
+  final confirmPassword = TextEditingController();
   bool busy = false, hidden = true;
   late String mode = widget.tokenHash != null
       ? 'reset'
@@ -96,6 +97,7 @@ class _LoginState extends State<_Login> {
   void dispose() {
     email.dispose();
     password.dispose();
+    confirmPassword.dispose();
     super.dispose();
   }
 
@@ -116,6 +118,7 @@ class _LoginState extends State<_Login> {
         await widget.api.reset(widget.tokenHash!, password.text);
         mode = widget.recoveryOnly ? 'recover' : 'login';
         password.clear();
+        confirmPassword.clear();
         message = widget.recoveryOnly
             ? 'Senha atualizada. Volte ao aplicativo e entre com a nova senha.'
             : 'Senha atualizada. Entre com a nova senha.';
@@ -237,6 +240,34 @@ class _LoginState extends State<_Login> {
                         : null,
                   ),
                   const SizedBox(height: 10),
+                ],
+                if (mode == 'reset') ...[
+                  const SizedBox(height: 8),
+                  TextFormField(
+                    controller: confirmPassword,
+                    enabled: !busy,
+                    obscureText: hidden,
+                    autofillHints: const [AutofillHints.newPassword],
+                    decoration: const InputDecoration(
+                      labelText: 'Confirmar nova senha',
+                      prefixIcon: Icon(Icons.lock_outline, size: 20),
+                    ),
+                    validator: (value) => value == password.text
+                        ? null
+                        : 'As senhas precisam ser iguais.',
+                    onFieldSubmitted: (_) => busy ? null : submit(),
+                  ),
+                  TextButton(
+                    onPressed: busy
+                        ? null
+                        : () => setState(() {
+                            mode = 'recover';
+                            message = null;
+                            password.clear();
+                            confirmPassword.clear();
+                          }),
+                    child: const Text('Link expirou? Solicitar outro'),
+                  ),
                 ],
                 if (mode == 'login')
                   Align(
