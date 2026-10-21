@@ -1,3 +1,4 @@
+import 'completed_stages_timeline.dart';
 import 'client_monitoring.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -477,170 +478,134 @@ class _DetailState extends State<_Detail> {
       ? 'A confirmar'
       : '${value.day.toString().padLeft(2, '0')}/${value.month.toString().padLeft(2, '0')}/${value.year}';
   @override
-  Widget build(
-    BuildContext context,
-  ) => FutureBuilder<(Installation, List<InstallationStage>, List<ClientDocument>)>(
-    future: data,
-    builder: (context, snapshot) {
-      if (snapshot.connectionState != ConnectionState.done) {
-        return const Center(child: CircularProgressIndicator());
-      }
-      if (snapshot.hasError) {
-        return _Error(
-          error: snapshot.error!,
-          retry: () => setState(() => data = load()),
-        );
-      }
-      final (installation, stages, documents) = snapshot.data!;
-      return SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 1000),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: TextButton.icon(
-                    onPressed: widget.back,
-                    icon: const Icon(Icons.arrow_back),
-                    label: const Text('Minhas instalações'),
-                  ),
-                ),
-                const SizedBox(height: 24),
-                Text(
-                  installation.codigo,
-                  style: Theme.of(context).textTheme.headlineLarge,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  installation.statusLabel,
-                  style: const TextStyle(color: AppTheme.lime),
-                ),
-                const SizedBox(height: 28),
-                GlassSurface(
-                  child: Wrap(
-                    spacing: 40,
-                    runSpacing: 24,
-                    children: [
-                      _Metric(
-                        '${installation.potenciaKwp.toStringAsFixed(2)} kWp',
-                        'Potência instalada',
+  Widget build(BuildContext context) =>
+      FutureBuilder<
+        (Installation, List<InstallationStage>, List<ClientDocument>)
+      >(
+        future: data,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState != ConnectionState.done) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasError) {
+            return _Error(
+              error: snapshot.error!,
+              retry: () => setState(() => data = load()),
+            );
+          }
+          final (installation, stages, documents) = snapshot.data!;
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(24),
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 1000),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: TextButton.icon(
+                        onPressed: widget.back,
+                        icon: const Icon(Icons.arrow_back),
+                        label: const Text('Minhas instalações'),
                       ),
-                      _Metric('${installation.quantidadeModulos}', 'Módulos'),
-                      _Metric(
-                        date(installation.dataPrevisaoEntrega),
-                        'Previsão de entrega',
+                    ),
+                    const SizedBox(height: 24),
+                    Text(
+                      installation.codigo,
+                      style: Theme.of(context).textTheme.headlineLarge,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      installation.statusLabel,
+                      style: const TextStyle(color: AppTheme.lime),
+                    ),
+                    const SizedBox(height: 28),
+                    GlassSurface(
+                      child: Wrap(
+                        spacing: 40,
+                        runSpacing: 24,
+                        children: [
+                          _Metric(
+                            '${installation.potenciaKwp.toStringAsFixed(2)} kWp',
+                            'Potência instalada',
+                          ),
+                          _Metric(
+                            '${installation.quantidadeModulos}',
+                            'Módulos',
+                          ),
+                          _Metric(
+                            date(installation.dataPrevisaoEntrega),
+                            'Previsão de entrega',
+                          ),
+                          if (installation.dataConclusao != null)
+                            _Metric(
+                              date(installation.dataConclusao),
+                              'Conclusão',
+                            ),
+                        ],
                       ),
-                      if (installation.dataConclusao != null)
-                        _Metric(date(installation.dataConclusao), 'Conclusão'),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 32),
-                Text(
-                  'Etapas da instalação',
-                  style: Theme.of(context).textTheme.headlineSmall,
-                ),
-                const SizedBox(height: 16),
-                GlassSurface(
-                  blur: false,
-                  child: Column(
-                    children: [
-                      if (stages.isEmpty)
-                        const Text(
-                          'As etapas serão disponibilizadas pela equipe.',
-                        ),
-                      for (final stage in stages)
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Icon(
-                                stage.completed
-                                    ? Icons.check_circle
-                                    : Icons.radio_button_unchecked,
-                                color: stage.completed
-                                    ? AppTheme.lime
-                                    : AppTheme.muted,
+                    ),
+                    const SizedBox(height: 32),
+                    Text(
+                      'Etapas da instalação',
+                      style: Theme.of(context).textTheme.headlineSmall,
+                    ),
+                    const SizedBox(height: 16),
+                    GlassSurface(
+                      blur: false,
+                      child: CompletedStagesTimeline(stages: stages),
+                    ),
+                    const SizedBox(height: 32),
+                    Text(
+                      'Seus documentos',
+                      style: Theme.of(context).textTheme.headlineSmall,
+                    ),
+                    const SizedBox(height: 16),
+                    GlassSurface(
+                      blur: false,
+                      child: Column(
+                        children: [
+                          if (documents.isEmpty)
+                            const Text(
+                              'Nenhum documento disponibilizado ainda.',
+                            ),
+                          for (final document in documents)
+                            ListTile(
+                              contentPadding: EdgeInsets.zero,
+                              leading: const Icon(
+                                Icons.description_outlined,
+                                color: AppTheme.lime,
                               ),
-                              const SizedBox(width: 16),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      stage.nome,
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 6),
-                                    Text(
-                                      '${stage.label}${stage.dataConclusao == null ? '' : ' · ${date(stage.dataConclusao)}'}',
-                                      style: const TextStyle(
-                                        color: AppTheme.muted,
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                              title: Text(document.nome),
+                              subtitle: Text(document.tipo),
+                              trailing: IconButton(
+                                tooltip: 'Abrir documento',
+                                onPressed: downloading != null
+                                    ? null
+                                    : () => openDocument(document),
+                                icon: downloading == document.id
+                                    ? const SizedBox(
+                                        width: 20,
+                                        height: 20,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                        ),
+                                      )
+                                    : const Icon(Icons.open_in_new),
                               ),
-                            ],
-                          ),
-                        ),
-                    ],
-                  ),
+                            ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 40),
+                  ],
                 ),
-                const SizedBox(height: 32),
-                Text(
-                  'Seus documentos',
-                  style: Theme.of(context).textTheme.headlineSmall,
-                ),
-                const SizedBox(height: 16),
-                GlassSurface(
-                  blur: false,
-                  child: Column(
-                    children: [
-                      if (documents.isEmpty)
-                        const Text('Nenhum documento disponibilizado ainda.'),
-                      for (final document in documents)
-                        ListTile(
-                          contentPadding: EdgeInsets.zero,
-                          leading: const Icon(
-                            Icons.description_outlined,
-                            color: AppTheme.lime,
-                          ),
-                          title: Text(document.nome),
-                          subtitle: Text(document.tipo),
-                          trailing: IconButton(
-                            tooltip: 'Abrir documento',
-                            onPressed: downloading != null
-                                ? null
-                                : () => openDocument(document),
-                            icon: downloading == document.id
-                                ? const SizedBox(
-                                    width: 20,
-                                    height: 20,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                    ),
-                                  )
-                                : const Icon(Icons.open_in_new),
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 40),
-              ],
+              ),
             ),
-          ),
-        ),
+          );
+        },
       );
-    },
-  );
 }
 
 class _Metric extends StatelessWidget {
