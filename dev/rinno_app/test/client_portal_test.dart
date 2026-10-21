@@ -101,7 +101,16 @@ void main() {
     await tester.tap(find.text('Ver instalação'));
     await tester.pumpAndSettle();
     expect(find.text('Instalação dos módulos'), findsOneWidget);
-    await tester.scrollUntilVisible(find.text('Manual do sistema.pdf'), 300);
+    await tester.scrollUntilVisible(
+      find.text('Manual do sistema.pdf'),
+      300,
+      scrollable: find
+          .descendant(
+            of: find.byType(Dialog),
+            matching: find.byType(Scrollable),
+          )
+          .first,
+    );
     expect(find.text('Manual do sistema.pdf'), findsOneWidget);
     expect(find.text('Excluir'), findsNothing);
     expect(tester.takeException(), isNull);

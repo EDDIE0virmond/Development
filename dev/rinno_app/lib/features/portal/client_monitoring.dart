@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'monitoring_history.dart';
 import '../../core/network/app_api.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/theme/widgets/glass_surface.dart';
@@ -137,7 +138,15 @@ class _PlantEnergyState extends State<_PlantEnergy> {
                     ),
                     Flexible(
                       child: SingleChildScrollView(
-                        child: _reportView(details: true),
+                        child: Column(
+                          children: [
+                            MonitoringHistory(
+                              api: widget.api,
+                              id: widget.plant['id'] as String,
+                            ),
+                            _reportView(details: true),
+                          ],
+                        ),
                       ),
                     ),
                     TextButton.icon(

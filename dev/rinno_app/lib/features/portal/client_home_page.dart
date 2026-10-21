@@ -17,7 +17,52 @@ class ClientHomePage extends StatefulWidget {
 class _ClientHomePageState extends State<ClientHomePage> {
   late Future<InstallationPage> page = widget.api.installations();
   final List<Installation> previous = [];
-  String? selected;
+  void openProject(String id) {
+    showDialog<void>(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: AppTheme.navy,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(26)),
+        clipBehavior: Clip.antiAlias,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 760),
+          child: SizedBox(
+            height: MediaQuery.sizeOf(context).height * .85,
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 12, 12, 0),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'Minha instalação',
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
+                      ),
+                      IconButton(
+                        tooltip: 'Fechar instalação',
+                        onPressed: () => Navigator.pop(context),
+                        icon: const Icon(Icons.close),
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: _Detail(
+                    api: widget.api,
+                    id: id,
+                    back: () => Navigator.pop(context),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 
   Future<void> logout() async {
     final messenger = ScaffoldMessenger.of(context);
@@ -50,197 +95,186 @@ class _ClientHomePageState extends State<ClientHomePage> {
         ),
       ),
       Expanded(
-        child: selected != null
-            ? _Detail(
-                key: ValueKey(selected),
-                api: widget.api,
-                id: selected!,
-                back: () => setState(() => selected = null),
-              )
-            : FutureBuilder<InstallationPage>(
-                future: page,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState != ConnectionState.done) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                  if (snapshot.hasError) {
-                    return _Error(
-                      error: snapshot.error!,
-                      retry: () => setState(
-                        () => page = widget.api.installations(
-                          offset: previous.length,
+        child: FutureBuilder<InstallationPage>(
+          future: page,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState != ConnectionState.done) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (snapshot.hasError) {
+              return _Error(
+                error: snapshot.error!,
+                retry: () => setState(
+                  () =>
+                      page = widget.api.installations(offset: previous.length),
+                ),
+              );
+            }
+            final data = snapshot.data!;
+            final items = [...previous, ...data.items];
+            return SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(24, 24, 24, 40),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 1100),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const Text(
+                        'BEM-VINDO AO SEU PORTAL',
+                        style: TextStyle(
+                          color: AppTheme.lime,
+                          fontSize: 11,
+                          letterSpacing: 2,
                         ),
                       ),
-                    );
-                  }
-                  final data = snapshot.data!;
-                  final items = [...previous, ...data.items];
-                  return SingleChildScrollView(
-                    padding: const EdgeInsets.fromLTRB(24, 24, 24, 40),
-                    child: Center(
-                      child: ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 1100),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                      const SizedBox(height: 12),
+                      Text(
+                        'Olá, ${widget.api.user!.nome.split(' ').first}.',
+                        style: Theme.of(context).textTheme.headlineLarge,
+                      ),
+                      const SizedBox(height: 12),
+                      const Text(
+                        'Cada etapa da sua instalação, mais perto de você.',
+                        style: TextStyle(color: AppTheme.muted, fontSize: 16),
+                      ),
+                      const SizedBox(height: 32),
+                      GlassSurface(
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
-                              'BEM-VINDO AO SEU PORTAL',
-                              style: TextStyle(
-                                color: AppTheme.lime,
-                                fontSize: 11,
-                                letterSpacing: 2,
-                              ),
+                            const Icon(
+                              Icons.wb_sunny_outlined,
+                              color: AppTheme.lime,
+                              size: 36,
                             ),
-                            const SizedBox(height: 12),
-                            Text(
-                              'Olá, ${widget.api.user!.nome.split(' ').first}.',
-                              style: Theme.of(context).textTheme.headlineLarge,
-                            ),
-                            const SizedBox(height: 12),
-                            const Text(
-                              'Cada etapa da sua instalação, mais perto de você.',
-                              style: TextStyle(
-                                color: AppTheme.muted,
-                                fontSize: 16,
-                              ),
-                            ),
-                            const SizedBox(height: 32),
-                            GlassSurface(
-                              child: Row(
+                            const SizedBox(width: 20),
+                            Expanded(
+                              child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Icon(
-                                    Icons.wb_sunny_outlined,
-                                    color: AppTheme.lime,
-                                    size: 36,
+                                  Text(
+                                    'Sua energia está em boas mãos.',
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.titleLarge,
                                   ),
-                                  const SizedBox(width: 20),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          'Sua energia está em boas mãos.',
-                                          style: Theme.of(
-                                            context,
-                                          ).textTheme.titleLarge,
-                                        ),
-                                        const SizedBox(height: 8),
-                                        const Text(
-                                          'Consulte o andamento e os documentos disponibilizados pela nossa equipe.',
-                                          style: TextStyle(
-                                            color: AppTheme.muted,
-                                            height: 1.6,
-                                          ),
-                                        ),
-                                      ],
+                                  const SizedBox(height: 8),
+                                  const Text(
+                                    'Consulte o andamento e os documentos disponibilizados pela nossa equipe.',
+                                    style: TextStyle(
+                                      color: AppTheme.muted,
+                                      height: 1.6,
                                     ),
                                   ),
                                 ],
                               ),
                             ),
-                            const SizedBox(height: 36),
-                            Text(
-                              'Minhas instalações',
-                              style: Theme.of(context).textTheme.headlineSmall,
-                            ),
-                            const SizedBox(height: 20),
-                            if (items.isEmpty)
-                              const GlassSurface(
-                                child: Text(
-                                  'Nenhuma instalação por aqui ainda\nAssim que sua instalação for vinculada, ela aparecerá aqui.',
-                                ),
-                              ),
-                            LayoutBuilder(
-                              builder: (context, c) => Wrap(
-                                spacing: 20,
-                                runSpacing: 20,
-                                children: items
-                                    .map(
-                                      (item) => SizedBox(
-                                        width: c.maxWidth >= 700
-                                            ? (c.maxWidth - 20) / 2
-                                            : c.maxWidth,
-                                        child: GlassSurface(
-                                          blur: false,
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.stretch,
-                                            children: [
-                                              const Align(
-                                                alignment: Alignment.centerLeft,
-                                                child: Icon(
-                                                  Icons.solar_power_outlined,
-                                                  color: AppTheme.lime,
-                                                  size: 32,
-                                                ),
-                                              ),
-                                              const SizedBox(height: 24),
-                                              Text(
-                                                item.codigo,
-                                                style: Theme.of(
-                                                  context,
-                                                ).textTheme.titleLarge,
-                                              ),
-                                              const SizedBox(height: 8),
-                                              Text(
-                                                item.statusLabel,
-                                                style: const TextStyle(
-                                                  color: AppTheme.lime,
-                                                ),
-                                              ),
-                                              const SizedBox(height: 24),
-                                              Text(
-                                                '${item.potenciaKwp.toStringAsFixed(2)} kWp',
-                                                style: Theme.of(
-                                                  context,
-                                                ).textTheme.headlineMedium,
-                                              ),
-                                              const Text(
-                                                'Potência do sistema',
-                                                style: TextStyle(
-                                                  color: AppTheme.muted,
-                                                ),
-                                              ),
-                                              const SizedBox(height: 24),
-                                              OutlinedButton(
-                                                onPressed: () => setState(
-                                                  () => selected = item.id,
-                                                ),
-                                                child: const Text(
-                                                  'Ver instalação',
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    )
-                                    .toList(),
-                              ),
-                            ),
-                            if (data.hasMore)
-                              Padding(
-                                padding: const EdgeInsets.only(top: 24),
-                                child: OutlinedButton(
-                                  onPressed: () => setState(() {
-                                    previous.addAll(data.items);
-                                    page = widget.api.installations(
-                                      offset: previous.length,
-                                    );
-                                  }),
-                                  child: const Text('Carregar mais'),
-                                ),
-                              ),
-                            ClientMonitoring(api: widget.api),
                           ],
                         ),
                       ),
-                    ),
-                  );
-                },
+                      const SizedBox(height: 36),
+                      Text(
+                        'Minhas instalações',
+                        style: Theme.of(context).textTheme.headlineSmall,
+                      ),
+                      const SizedBox(height: 20),
+                      if (items.isEmpty)
+                        const GlassSurface(
+                          child: Text(
+                            'Nenhuma instalação por aqui ainda\nAssim que sua instalação for vinculada, ela aparecerá aqui.',
+                          ),
+                        ),
+                      for (final item in items)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 16),
+                          child: GlassSurface(
+                            blur: false,
+                            padding: EdgeInsets.zero,
+                            child: Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                onTap: () => openProject(item.id),
+                                borderRadius: BorderRadius.circular(26),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(24),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.stretch,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          const Icon(
+                                            Icons.solar_power_outlined,
+                                            color: AppTheme.lime,
+                                          ),
+                                          const SizedBox(width: 12),
+                                          Expanded(
+                                            child: Text(
+                                              item.codigo,
+                                              style: Theme.of(
+                                                context,
+                                              ).textTheme.titleLarge,
+                                            ),
+                                          ),
+                                          const Icon(Icons.chevron_right),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 16),
+                                      Text(
+                                        item.statusLabel,
+                                        style: const TextStyle(
+                                          color: AppTheme.lime,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 16),
+                                      Wrap(
+                                        spacing: 32,
+                                        runSpacing: 16,
+                                        children: [
+                                          _Metric(
+                                            '${item.potenciaKwp.toStringAsFixed(2)} kWp',
+                                            'Potência do sistema',
+                                          ),
+                                          _Metric(
+                                            '${item.quantidadeModulos}',
+                                            'Módulos',
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 16),
+                                      const Text(
+                                        'Ver instalação',
+                                        style: TextStyle(color: AppTheme.muted),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      if (data.hasMore)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 24),
+                          child: OutlinedButton(
+                            onPressed: () => setState(() {
+                              previous.addAll(data.items);
+                              page = widget.api.installations(
+                                offset: previous.length,
+                              );
+                            }),
+                            child: const Text('Carregar mais'),
+                          ),
+                        ),
+                      ClientMonitoring(api: widget.api),
+                    ],
+                  ),
+                ),
               ),
+            );
+          },
+        ),
       ),
     ],
   );
@@ -280,12 +314,7 @@ class _Detail extends StatefulWidget {
   final AppApi api;
   final String id;
   final VoidCallback back;
-  const _Detail({
-    super.key,
-    required this.api,
-    required this.id,
-    required this.back,
-  });
+  const _Detail({required this.api, required this.id, required this.back});
   @override
   State<_Detail> createState() => _DetailState();
 }

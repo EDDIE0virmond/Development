@@ -15,6 +15,9 @@ void main() {
         client: MockClient((request) async {
           if (request.url.path.endsWith('/login'))
             return jsonResponse(session('token'));
+          if (request.url.path.endsWith('/insights')) {
+            return jsonResponse({'series': [], 'timezone': 'America/Sao_Paulo'});
+          }
           if (request.url.path.endsWith('/energy')) {
             queries++;
             return jsonResponse({

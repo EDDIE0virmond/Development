@@ -329,6 +329,16 @@ class AppApi extends ChangeNotifier {
     authenticated: true,
   );
 
+  Future<Map<String, dynamic>> monitoringHistory(
+    String id,
+    String date, {
+    String? serial,
+  }) => _send(
+    'GET',
+    '/monitoring/${Uri.encodeComponent(id)}/insights?date=${Uri.encodeComponent(date)}${serial == null ? '' : '&serial=${Uri.encodeComponent(serial)}'}',
+    authenticated: true,
+  );
+
   Future<Uri> download(String id) async {
     final result = await _send(
       'GET',
