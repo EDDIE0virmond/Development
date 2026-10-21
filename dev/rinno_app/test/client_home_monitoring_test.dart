@@ -65,7 +65,7 @@ void main() {
           greaterThan(tester.getBottomLeft(find.text('Ver instalação')).dy),
         );
       }
-      expect(energyCalls, 0);
+      expect(energyCalls, linked ? 1 : 0);
       expect(tester.takeException(), isNull);
       await tester.pumpWidget(const SizedBox());
       api.dispose();
