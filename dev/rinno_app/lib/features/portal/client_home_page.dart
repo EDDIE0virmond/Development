@@ -18,7 +18,6 @@ class _ClientHomePageState extends State<ClientHomePage> {
   late Future<InstallationPage> page = widget.api.installations();
   final List<Installation> previous = [];
   String? selected;
-  bool showMonitoring = false;
 
   Future<void> logout() async {
     final messenger = ScaffoldMessenger.of(context);
@@ -30,324 +29,220 @@ class _ClientHomePageState extends State<ClientHomePage> {
   }
 
   @override
-  Widget build(BuildContext context) => LayoutBuilder(
-    builder: (context, size) => Row(
-      children: [
-        if (size.maxWidth >= 1100)
-          SizedBox(
-            width: 250,
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const BrandMark(),
-                  const SizedBox(height: 64),
-                  const Text(
-                    'SEU PORTAL',
-                    style: TextStyle(
-                      color: AppTheme.muted,
-                      letterSpacing: 2,
-                      fontSize: 10,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  ListTile(
-                    selected: !showMonitoring,
-                    selectedColor: AppTheme.lime,
-                    leading: const Icon(Icons.solar_power_outlined),
-                    title: const Text('Instalações'),
-                    onTap: () => setState(() {
-                      selected = null;
-                      showMonitoring = false;
-                    }),
-                  ),
-                  const Spacer(),
-                  const Text(
-                    'Energia que aproxima.',
-                    style: TextStyle(color: AppTheme.muted),
-                  ),
-                  const SizedBox(height: 16),
-                ],
+  Widget build(BuildContext context) => Column(
+    children: [
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        child: Row(
+          children: [
+            const Expanded(
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: BrandMark(compact: true),
               ),
             ),
-          ),
-        Expanded(
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 16,
-                ),
-                child: Row(
-                  children: [
-                    if (size.maxWidth < 1100)
-                      const Expanded(child: BrandMark(compact: true))
-                    else
-                      const Expanded(
-                        child: Text(
-                          'ACOMPANHE SUA ENERGIA',
-                          style: TextStyle(
-                            color: AppTheme.muted,
-                            fontSize: 11,
-                            letterSpacing: 2,
-                          ),
+            IconButton(
+              tooltip: 'Sair',
+              onPressed: logout,
+              icon: const Icon(Icons.logout),
+            ),
+          ],
+        ),
+      ),
+      Expanded(
+        child: selected != null
+            ? _Detail(
+                key: ValueKey(selected),
+                api: widget.api,
+                id: selected!,
+                back: () => setState(() => selected = null),
+              )
+            : FutureBuilder<InstallationPage>(
+                future: page,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState != ConnectionState.done) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  if (snapshot.hasError) {
+                    return _Error(
+                      error: snapshot.error!,
+                      retry: () => setState(
+                        () => page = widget.api.installations(
+                          offset: previous.length,
                         ),
                       ),
-                    IconButton(
-                      tooltip: 'Sair',
-                      onPressed: logout,
-                      icon: const Icon(Icons.logout),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(24, 0, 24, 12),
-                child: Wrap(
-                  spacing: 12,
-                  runSpacing: 8,
-                  children: [
-                    ChoiceChip(
-                      label: const Text('Instalações'),
-                      avatar: const Icon(Icons.solar_power_outlined, size: 18),
-                      selected: !showMonitoring,
-                      onSelected: (_) => setState(() {
-                        showMonitoring = false;
-                        selected = null;
-                      }),
-                    ),
-                    ChoiceChip(
-                      label: const Text('Monitoramento'),
-                      avatar: const Icon(Icons.insights_outlined, size: 18),
-                      selected: showMonitoring,
-                      onSelected: (_) => setState(() => showMonitoring = true),
-                    ),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: showMonitoring
-                    ? ClientMonitoring(api: widget.api)
-                    : selected != null
-                    ? _Detail(
-                        key: ValueKey(selected),
-                        api: widget.api,
-                        id: selected!,
-                        back: () => setState(() => selected = null),
-                      )
-                    : FutureBuilder<InstallationPage>(
-                        future: page,
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState !=
-                              ConnectionState.done) {
-                            return const Center(
-                              child: CircularProgressIndicator(),
-                            );
-                          }
-                          if (snapshot.hasError) {
-                            return _Error(
-                              error: snapshot.error!,
-                              retry: () => setState(
-                                () => page = widget.api.installations(
-                                  offset: previous.length,
-                                ),
-                              ),
-                            );
-                          }
-                          final data = snapshot.data!;
-                          final items = [...previous, ...data.items];
-                          return SingleChildScrollView(
-                            padding: const EdgeInsets.fromLTRB(24, 24, 24, 40),
-                            child: Center(
-                              child: ConstrainedBox(
-                                constraints: const BoxConstraints(
-                                  maxWidth: 1100,
-                                ),
-                                child: Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.stretch,
-                                  children: [
-                                    const Text(
-                                      'BEM-VINDO AO SEU PORTAL',
-                                      style: TextStyle(
-                                        color: AppTheme.lime,
-                                        fontSize: 11,
-                                        letterSpacing: 2,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 12),
-                                    Text(
-                                      'Olá, ${widget.api.user!.nome.split(' ').first}.',
-                                      style: Theme.of(
-                                        context,
-                                      ).textTheme.headlineLarge,
-                                    ),
-                                    const SizedBox(height: 12),
-                                    const Text(
-                                      'Cada etapa da sua instalação, mais perto de você.',
-                                      style: TextStyle(
-                                        color: AppTheme.muted,
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 32),
-                                    GlassSurface(
-                                      child: Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          const Icon(
-                                            Icons.wb_sunny_outlined,
-                                            color: AppTheme.lime,
-                                            size: 36,
-                                          ),
-                                          const SizedBox(width: 20),
-                                          Expanded(
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  'Sua energia está em boas mãos.',
-                                                  style: Theme.of(
-                                                    context,
-                                                  ).textTheme.titleLarge,
-                                                ),
-                                                const SizedBox(height: 8),
-                                                const Text(
-                                                  'Consulte o andamento e os documentos disponibilizados pela nossa equipe.',
-                                                  style: TextStyle(
-                                                    color: AppTheme.muted,
-                                                    height: 1.6,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    const SizedBox(height: 36),
-                                    Text(
-                                      'Minhas instalações',
-                                      style: Theme.of(
-                                        context,
-                                      ).textTheme.headlineSmall,
-                                    ),
-                                    const SizedBox(height: 20),
-                                    if (items.isEmpty)
-                                      const GlassSurface(
-                                        child: Text(
-                                          'Nenhuma instalação por aqui ainda\nAssim que sua instalação for vinculada, ela aparecerá aqui.',
-                                        ),
-                                      ),
-                                    LayoutBuilder(
-                                      builder: (context, c) => Wrap(
-                                        spacing: 20,
-                                        runSpacing: 20,
-                                        children: items
-                                            .map(
-                                              (item) => SizedBox(
-                                                width: c.maxWidth >= 700
-                                                    ? (c.maxWidth - 20) / 2
-                                                    : c.maxWidth,
-                                                child: GlassSurface(
-                                                  blur: false,
-                                                  child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .stretch,
-                                                    children: [
-                                                      const Align(
-                                                        alignment: Alignment
-                                                            .centerLeft,
-                                                        child: Icon(
-                                                          Icons
-                                                              .solar_power_outlined,
-                                                          color: AppTheme.lime,
-                                                          size: 32,
-                                                        ),
-                                                      ),
-                                                      const SizedBox(
-                                                        height: 24,
-                                                      ),
-                                                      Text(
-                                                        item.codigo,
-                                                        style: Theme.of(
-                                                          context,
-                                                        ).textTheme.titleLarge,
-                                                      ),
-                                                      const SizedBox(height: 8),
-                                                      Text(
-                                                        item.statusLabel,
-                                                        style: const TextStyle(
-                                                          color: AppTheme.lime,
-                                                        ),
-                                                      ),
-                                                      const SizedBox(
-                                                        height: 24,
-                                                      ),
-                                                      Text(
-                                                        '${item.potenciaKwp.toStringAsFixed(2)} kWp',
-                                                        style: Theme.of(context)
-                                                            .textTheme
-                                                            .headlineMedium,
-                                                      ),
-                                                      const Text(
-                                                        'Potência do sistema',
-                                                        style: TextStyle(
-                                                          color: AppTheme.muted,
-                                                        ),
-                                                      ),
-                                                      const SizedBox(
-                                                        height: 24,
-                                                      ),
-                                                      OutlinedButton(
-                                                        onPressed: () =>
-                                                            setState(
-                                                              () => selected =
-                                                                  item.id,
-                                                            ),
-                                                        child: const Text(
-                                                          'Ver instalação',
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                            )
-                                            .toList(),
-                                      ),
-                                    ),
-                                    if (data.hasMore)
-                                      Padding(
-                                        padding: const EdgeInsets.only(top: 24),
-                                        child: OutlinedButton(
-                                          onPressed: () => setState(() {
-                                            previous.addAll(data.items);
-                                            page = widget.api.installations(
-                                              offset: previous.length,
-                                            );
-                                          }),
-                                          child: const Text('Carregar mais'),
-                                        ),
-                                      ),
-                                  ],
-                                ),
+                    );
+                  }
+                  final data = snapshot.data!;
+                  final items = [...previous, ...data.items];
+                  return SingleChildScrollView(
+                    padding: const EdgeInsets.fromLTRB(24, 24, 24, 40),
+                    child: Center(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 1100),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            const Text(
+                              'BEM-VINDO AO SEU PORTAL',
+                              style: TextStyle(
+                                color: AppTheme.lime,
+                                fontSize: 11,
+                                letterSpacing: 2,
                               ),
                             ),
-                          );
-                        },
+                            const SizedBox(height: 12),
+                            Text(
+                              'Olá, ${widget.api.user!.nome.split(' ').first}.',
+                              style: Theme.of(context).textTheme.headlineLarge,
+                            ),
+                            const SizedBox(height: 12),
+                            const Text(
+                              'Cada etapa da sua instalação, mais perto de você.',
+                              style: TextStyle(
+                                color: AppTheme.muted,
+                                fontSize: 16,
+                              ),
+                            ),
+                            const SizedBox(height: 32),
+                            GlassSurface(
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Icon(
+                                    Icons.wb_sunny_outlined,
+                                    color: AppTheme.lime,
+                                    size: 36,
+                                  ),
+                                  const SizedBox(width: 20),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Sua energia está em boas mãos.',
+                                          style: Theme.of(
+                                            context,
+                                          ).textTheme.titleLarge,
+                                        ),
+                                        const SizedBox(height: 8),
+                                        const Text(
+                                          'Consulte o andamento e os documentos disponibilizados pela nossa equipe.',
+                                          style: TextStyle(
+                                            color: AppTheme.muted,
+                                            height: 1.6,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 36),
+                            Text(
+                              'Minhas instalações',
+                              style: Theme.of(context).textTheme.headlineSmall,
+                            ),
+                            const SizedBox(height: 20),
+                            if (items.isEmpty)
+                              const GlassSurface(
+                                child: Text(
+                                  'Nenhuma instalação por aqui ainda\nAssim que sua instalação for vinculada, ela aparecerá aqui.',
+                                ),
+                              ),
+                            LayoutBuilder(
+                              builder: (context, c) => Wrap(
+                                spacing: 20,
+                                runSpacing: 20,
+                                children: items
+                                    .map(
+                                      (item) => SizedBox(
+                                        width: c.maxWidth >= 700
+                                            ? (c.maxWidth - 20) / 2
+                                            : c.maxWidth,
+                                        child: GlassSurface(
+                                          blur: false,
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.stretch,
+                                            children: [
+                                              const Align(
+                                                alignment: Alignment.centerLeft,
+                                                child: Icon(
+                                                  Icons.solar_power_outlined,
+                                                  color: AppTheme.lime,
+                                                  size: 32,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 24),
+                                              Text(
+                                                item.codigo,
+                                                style: Theme.of(
+                                                  context,
+                                                ).textTheme.titleLarge,
+                                              ),
+                                              const SizedBox(height: 8),
+                                              Text(
+                                                item.statusLabel,
+                                                style: const TextStyle(
+                                                  color: AppTheme.lime,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 24),
+                                              Text(
+                                                '${item.potenciaKwp.toStringAsFixed(2)} kWp',
+                                                style: Theme.of(
+                                                  context,
+                                                ).textTheme.headlineMedium,
+                                              ),
+                                              const Text(
+                                                'Potência do sistema',
+                                                style: TextStyle(
+                                                  color: AppTheme.muted,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 24),
+                                              OutlinedButton(
+                                                onPressed: () => setState(
+                                                  () => selected = item.id,
+                                                ),
+                                                child: const Text(
+                                                  'Ver instalação',
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                    .toList(),
+                              ),
+                            ),
+                            if (data.hasMore)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 24),
+                                child: OutlinedButton(
+                                  onPressed: () => setState(() {
+                                    previous.addAll(data.items);
+                                    page = widget.api.installations(
+                                      offset: previous.length,
+                                    );
+                                  }),
+                                  child: const Text('Carregar mais'),
+                                ),
+                              ),
+                            ClientMonitoring(api: widget.api),
+                          ],
+                        ),
                       ),
+                    ),
+                  );
+                },
               ),
-            ],
-          ),
-        ),
-      ],
-    ),
+      ),
+    ],
   );
 }
 

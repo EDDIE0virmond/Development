@@ -39,8 +39,11 @@ class _ClientMonitoringState extends State<ClientMonitoring> {
         );
       }
       final plants = snapshot.data ?? [];
+      if (plants.isEmpty) return const SizedBox.shrink();
       return ListView.builder(
-        padding: const EdgeInsets.all(24),
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        padding: const EdgeInsets.only(top: 36),
         itemCount: plants.length + 1,
         itemBuilder: (context, index) {
           if (index == 0) {
@@ -50,7 +53,7 @@ class _ClientMonitoringState extends State<ClientMonitoring> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Sua energia, em detalhes.',
+                    'Monitoramento',
                     style: Theme.of(context).textTheme.headlineMedium,
                   ),
                   const SizedBox(height: 10),
