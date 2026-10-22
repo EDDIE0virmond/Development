@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/widgets/glass_surface.dart';
 
-/// Expands the selected card into an opaque, readable page, reversing on back.
+/// Expands the selected card into an opaque, readable page, collapsing toward its back button on close.
 Future<void> openCardPage(
   BuildContext context, {
   required String title,
@@ -14,6 +14,8 @@ Future<void> openCardPage(
   final card = box is RenderBox && box.hasSize
       ? box.localToGlobal(Offset.zero) & box.size
       : bounds;
+  final backKey = GlobalKey();
+  final mobile = size.width < 600;
   final reducedMotion = MediaQuery.disableAnimationsOf(context);
   return Navigator.of(context).push<void>(
     PageRouteBuilder<void>(
@@ -28,24 +30,40 @@ Future<void> openCardPage(
           body: SafeArea(
             child: Column(
               children: [
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: mobile ? 16 : 24,
+                    vertical: mobile ? 8 : 16,
+                  ),
                   child: SizedBox(
-                    height: 48,
+                    height: mobile ? 36 : 48,
                     child: Align(
                       alignment: Alignment.centerLeft,
-                      child: BrandMark(compact: true),
+                      child: SizedBox(
+                        width: mobile ? 170 : 210,
+                        child: const BrandMark(compact: true),
+                      ),
                     ),
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(24, 49, 24, 16),
+                  padding: EdgeInsets.fromLTRB(
+                    mobile ? 16 : 24,
+                    mobile ? 4 : 49,
+                    mobile ? 16 : 24,
+                    mobile ? 8 : 16,
+                  ),
                   child: Center(
                     child: ConstrainedBox(
                       constraints: const BoxConstraints(maxWidth: 1100),
                       child: Row(
                         children: [
                           IconButton.filledTonal(
+                            key: backKey,
+                            constraints: const BoxConstraints(
+                              minWidth: 48,
+                              minHeight: 48,
+                            ),
                             tooltip: 'Voltar para a tela principal',
                             onPressed: () => Navigator.pop(context),
                             icon: const Icon(Icons.arrow_back),
@@ -56,7 +74,9 @@ Future<void> openCardPage(
                               title,
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
-                              style: Theme.of(context).textTheme.headlineSmall,
+                              style: mobile
+                                  ? Theme.of(context).textTheme.titleLarge
+                                  : Theme.of(context).textTheme.headlineSmall,
                             ),
                           ),
                         ],
@@ -86,7 +106,12 @@ Future<void> openCardPage(
           animation: progress,
           child: child,
           builder: (context, child) {
-            final rect = Rect.lerp(card, bounds, progress.value)!;
+            final returning = animation.status == AnimationStatus.reverse;
+            final backBox = backKey.currentContext?.findRenderObject();
+            final target = returning && backBox is RenderBox && backBox.hasSize
+                ? backBox.localToGlobal(Offset.zero) & backBox.size
+                : card;
+            final rect = Rect.lerp(target, bounds, progress.value)!;
             return ClipPath(
               clipper: _PageReveal(rect, 26 * (1 - progress.value)),
               child: FadeTransition(opacity: progress, child: child),

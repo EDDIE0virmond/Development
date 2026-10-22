@@ -9,6 +9,10 @@ void main() {
   testWidgets(
     'card loads generation and opens details without another request',
     (tester) async {
+      tester.view.physicalSize = const Size(390, 844);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
       var queries = 0;
       final api = AppApi(
         store: MemoryStore(),
@@ -54,6 +58,11 @@ void main() {
       expect(find.text('240,0 kWh'), findsOneWidget);
       await tester.tap(find.text('Ver gráficos e detalhes'));
       await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+      expect(
+        tester.getBottomLeft(find.byTooltip('Voltar para a tela principal')).dy,
+        lessThan(120),
+      );
       expect(queries, 1);
       expect(find.byType(Dialog), findsNothing);
       expect(find.byTooltip('Voltar para a tela principal'), findsOneWidget);
