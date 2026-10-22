@@ -125,6 +125,8 @@ class _PlantEnergyState extends State<_PlantEnergy> {
                   children: [
                     Text(
                       'Resumo atual',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
                     SizedBox(
@@ -134,7 +136,9 @@ class _PlantEnergyState extends State<_PlantEnergy> {
                   ],
                 ),
               ),
-              const SizedBox(height: 20),
+              SizedBox(
+                height: MediaQuery.sizeOf(context).width < 600 ? 10 : 20,
+              ),
               GlassSurface(
                 padding: EdgeInsets.all(
                   MediaQuery.sizeOf(context).width < 600 ? 16 : 24,
@@ -144,6 +148,8 @@ class _PlantEnergyState extends State<_PlantEnergy> {
                   id: widget.plant['id'] as String,
                 ),
               ),
+              if (MediaQuery.sizeOf(context).width < 600)
+                _reportView(details: true, metadataOnly: true),
               const SizedBox(height: 24),
               TextButton.icon(
                 icon: const Icon(Icons.refresh),
@@ -162,6 +168,7 @@ class _PlantEnergyState extends State<_PlantEnergy> {
 
   Widget _reportView({
     bool details = false,
+    bool metadataOnly = false,
   }) => FutureBuilder<Map<String, dynamic>>(
     future: report,
     builder: (context, snapshot) {
@@ -190,37 +197,48 @@ class _PlantEnergyState extends State<_PlantEnergy> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           SizedBox(height: compact ? 0 : 20),
-          Wrap(
-            spacing: 28,
-            runSpacing: 16,
-            children: [
-              for (final metric in const {
-                'generationToday': 'Geração · dia',
-                'generationMonth': 'Geração · mês',
-              }.entries)
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      metric.value,
-                      style: const TextStyle(color: AppTheme.muted),
+          if (!metadataOnly)
+            Row(
+              children: [
+                for (final metric in const {
+                  'generationToday': 'Geração · dia',
+                  'generationMonth': 'Geração · mês',
+                }.entries)
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            compact
+                                ? (metric.key == 'generationToday'
+                                      ? 'Hoje'
+                                      : 'Este mês')
+                                : metric.value,
+                            style: const TextStyle(color: AppTheme.muted),
+                          ),
+                          FittedBox(
+                            fit: BoxFit.scaleDown,
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              _energy(data[metric.key]),
+                              style: Theme.of(context).textTheme.titleLarge
+                                  ?.copyWith(color: AppTheme.lime),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                    Text(
-                      _energy(data[metric.key]),
-                      style: Theme.of(
-                        context,
-                      ).textTheme.titleLarge?.copyWith(color: AppTheme.lime),
-                    ),
-                  ],
-                ),
-            ],
-          ),
+                  ),
+              ],
+            ),
           if (data['stale'] == true)
             const Text(
               'Última leitura desatualizada',
               style: TextStyle(color: Colors.amber),
             ),
-          if (details) ...[
+          if (details && (!compact || metadataOnly)) ...[
             SizedBox(height: compact ? 4 : 24),
             if (compact)
               ExpansionTile(

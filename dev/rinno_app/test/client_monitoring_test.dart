@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rinno_app/core/theme/app_theme.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/testing.dart';
 import 'package:rinno_app/core/network/app_api.dart';
@@ -61,6 +62,7 @@ void main() {
       await api.login('client@example.test', 'correct-password');
       await tester.pumpWidget(
         MaterialApp(
+          theme: AppTheme.dark,
           home: Scaffold(body: ClientMonitoring(api: api)),
         ),
       );
@@ -75,6 +77,26 @@ void main() {
         tester.getBottomLeft(find.byTooltip('Voltar para a tela principal')).dy,
         lessThan(120),
       );
+      for (final size in [
+        const Size(320, 568),
+        const Size(360, 640),
+        const Size(390, 760),
+        const Size(430, 932),
+      ]) {
+        tester.view.physicalSize = size;
+        await tester.pumpAndSettle();
+        final chart = find.byWidgetPredicate(
+          (w) =>
+              w is CustomPaint &&
+              w.painter.runtimeType.toString() == '_HistoryPainter',
+        );
+        expect(
+          tester.getBottomRight(chart).dy,
+          lessThanOrEqualTo(size.height),
+          reason: 'Whole chart on $size',
+        );
+        expect(tester.takeException(), isNull);
+      }
       expect(queries, 1);
       expect(find.byType(Dialog), findsNothing);
       expect(find.byTooltip('Voltar para a tela principal'), findsOneWidget);

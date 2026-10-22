@@ -55,12 +55,14 @@ class _MonitoringHistoryState extends State<MonitoringHistory> {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
-      const SizedBox(height: 16),
+      SizedBox(height: MediaQuery.sizeOf(context).width < 600 ? 0 : 16),
       const Text(
         'Histórico de geração',
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
         style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
       ),
-      const SizedBox(height: 12),
+      SizedBox(height: MediaQuery.sizeOf(context).width < 600 ? 6 : 12),
       SegmentedButton<bool>(
         segments: const [
           ButtonSegment(value: false, label: Text('Dia')),
@@ -72,7 +74,7 @@ class _MonitoringHistoryState extends State<MonitoringHistory> {
           metric = null;
         }),
       ),
-      const SizedBox(height: 12),
+      SizedBox(height: MediaQuery.sizeOf(context).width < 600 ? 6 : 12),
       if (!monthly)
         OutlinedButton.icon(
           onPressed: pickDay,
@@ -100,7 +102,7 @@ class _MonitoringHistoryState extends State<MonitoringHistory> {
               });
           },
         ),
-      const SizedBox(height: 16),
+      SizedBox(height: MediaQuery.sizeOf(context).width < 600 ? 4 : 16),
       FutureBuilder<Map<String, dynamic>>(
         future: load(),
         builder: (context, snapshot) {
@@ -166,7 +168,9 @@ class _MonitoringHistoryState extends State<MonitoringHistory> {
                     metric = null;
                   }),
                 ),
-                const SizedBox(height: 12),
+                SizedBox(
+                  height: MediaQuery.sizeOf(context).width < 600 ? 6 : 12,
+                ),
               ],
               if (series.length > 1)
                 DropdownButtonFormField<String>(
@@ -188,14 +192,21 @@ class _MonitoringHistoryState extends State<MonitoringHistory> {
                 ),
               if (selected != null)
                 Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  padding: EdgeInsets.symmetric(
+                    vertical: MediaQuery.sizeOf(context).width < 600 ? 4 : 12,
+                  ),
                   child: Text(
                     '${selected['label']}${unit.isEmpty ? ' • unidade não informada' : ' ($unit)'}',
                   ),
                 ),
               if (points.any((p) => p['value'] is num)) ...[
                 SizedBox(
-                  height: 190,
+                  height: MediaQuery.sizeOf(context).width < 600
+                      ? (MediaQuery.sizeOf(context).height - 480).clamp(
+                          100.0,
+                          190.0,
+                        )
+                      : 190,
                   child: RepaintBoundary(
                     child: CustomPaint(
                       painter: _HistoryPainter(points, monthly),
