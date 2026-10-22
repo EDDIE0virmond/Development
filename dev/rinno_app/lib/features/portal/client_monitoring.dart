@@ -107,11 +107,19 @@ class _PlantEnergyState extends State<_PlantEnergy> {
       title: widget.plant['name'] as String,
       builder: (context) => StatefulBuilder(
         builder: (context, updatePage) => SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
+          padding: EdgeInsets.fromLTRB(
+            MediaQuery.sizeOf(context).width < 600 ? 16 : 24,
+            8,
+            MediaQuery.sizeOf(context).width < 600 ? 16 : 24,
+            32,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               GlassSurface(
+                padding: EdgeInsets.all(
+                  MediaQuery.sizeOf(context).width < 600 ? 16 : 24,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -126,6 +134,9 @@ class _PlantEnergyState extends State<_PlantEnergy> {
               ),
               const SizedBox(height: 20),
               GlassSurface(
+                padding: EdgeInsets.all(
+                  MediaQuery.sizeOf(context).width < 600 ? 16 : 24,
+                ),
                 child: MonitoringHistory(
                   api: widget.api,
                   id: widget.plant['id'] as String,

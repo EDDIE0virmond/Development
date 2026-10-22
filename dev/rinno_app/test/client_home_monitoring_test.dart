@@ -71,9 +71,18 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.byType(Dialog), findsNothing);
       expect(find.text('Minha instalação'), findsOneWidget);
-      tester.view.physicalSize = const Size(390, 844);
-      await tester.pumpAndSettle();
-      expect(tester.takeException(), isNull);
+      for (final size in [
+        const Size(320, 640),
+        const Size(390, 844),
+        const Size(430, 932),
+        const Size(768, 1024),
+        const Size(844, 390),
+        const Size(1440, 900),
+      ]) {
+        tester.view.physicalSize = size;
+        await tester.pumpAndSettle();
+        expect(tester.takeException(), isNull, reason: 'Installation $size');
+      }
       await tester.tap(find.byTooltip('Voltar para a tela principal'));
       await tester.pumpAndSettle();
       expect(find.byType(Dialog), findsNothing);

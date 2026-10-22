@@ -21,7 +21,19 @@ void main() {
             return jsonResponse(session('token'));
           if (request.url.path.endsWith('/insights')) {
             return jsonResponse({
-              'series': [],
+              'series': [
+                for (final period in ['day', 'month'])
+                  {
+                    'key': period,
+                    'label': 'Geração',
+                    'unit': 'kWh',
+                    'period': period,
+                    'points': List.generate(
+                      24,
+                      (i) => {'time': '$i', 'value': (i % 8) * 2.0},
+                    ),
+                  },
+              ],
               'timezone': 'America/Sao_Paulo',
             });
           }
@@ -73,6 +85,24 @@ void main() {
         tester.getTopLeft(find.text('Resumo atual')).dy,
         lessThan(tester.getTopLeft(find.text('Histórico de geração')).dy),
       );
+      await tester.ensureVisible(find.text('Mês'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Mês'));
+      await tester.pumpAndSettle();
+      for (final size in [
+        const Size(320, 640),
+        const Size(430, 932),
+        const Size(768, 1024),
+        const Size(844, 390),
+        const Size(1440, 900),
+      ]) {
+        tester.view.physicalSize = size;
+        await tester.pumpAndSettle();
+        expect(tester.takeException(), isNull, reason: 'Layout $size');
+
+        expect(tester.takeException(), isNull, reason: 'Monthly chart $size');
+        expect(find.text('Leituras por dia do mês'), findsOneWidget);
+      }
       await tester.tap(find.byTooltip('Voltar para a tela principal'));
       await tester.pumpAndSettle();
       expect(find.byType(Dialog), findsNothing);

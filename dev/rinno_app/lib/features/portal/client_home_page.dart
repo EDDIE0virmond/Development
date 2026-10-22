@@ -165,7 +165,11 @@ class _ClientHomePageState extends State<ClientHomePage> {
                                 onTap: () => openProject(item.id),
                                 borderRadius: BorderRadius.circular(26),
                                 child: Padding(
-                                  padding: const EdgeInsets.all(24),
+                                  padding: EdgeInsets.all(
+                                    MediaQuery.sizeOf(context).width < 600
+                                        ? 16
+                                        : 24,
+                                  ),
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.stretch,
@@ -386,7 +390,9 @@ class _DetailState extends State<_Detail> {
           }
           final (installation, stages, documents) = snapshot.data!;
           return SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
+            padding: EdgeInsets.all(
+              MediaQuery.sizeOf(context).width < 600 ? 16 : 24,
+            ),
             child: Center(
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 1000),

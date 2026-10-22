@@ -15,7 +15,6 @@ Future<void> openCardPage(
       ? box.localToGlobal(Offset.zero) & box.size
       : bounds;
   final backKey = GlobalKey();
-  final mobile = size.width < 600;
   final reducedMotion = MediaQuery.disableAnimationsOf(context);
   return Navigator.of(context).push<void>(
     PageRouteBuilder<void>(
@@ -24,79 +23,89 @@ Future<void> openCardPage(
       reverseTransitionDuration: Duration(
         milliseconds: reducedMotion ? 0 : 300,
       ),
-      pageBuilder: (context, animation, secondaryAnimation) => PortalBackground(
-        child: Scaffold(
-          backgroundColor: Colors.transparent,
-          body: SafeArea(
-            child: Column(
-              children: [
-                Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: mobile ? 16 : 24,
-                    vertical: mobile ? 8 : 16,
-                  ),
-                  child: SizedBox(
-                    height: mobile ? 36 : 48,
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: SizedBox(
-                        width: mobile ? 170 : 210,
-                        child: const BrandMark(compact: true),
-                      ),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.fromLTRB(
-                    mobile ? 16 : 24,
-                    mobile ? 4 : 49,
-                    mobile ? 16 : 24,
-                    mobile ? 8 : 16,
-                  ),
-                  child: Center(
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 1100),
-                      child: Row(
-                        children: [
-                          IconButton.filledTonal(
-                            key: backKey,
-                            constraints: const BoxConstraints(
-                              minWidth: 48,
-                              minHeight: 48,
-                            ),
-                            tooltip: 'Voltar para a tela principal',
-                            onPressed: () => Navigator.pop(context),
-                            icon: const Icon(Icons.arrow_back),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: Text(
-                              title,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: mobile
-                                  ? Theme.of(context).textTheme.titleLarge
-                                  : Theme.of(context).textTheme.headlineSmall,
+      pageBuilder: (context, animation, secondaryAnimation) {
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            final mobile =
+                constraints.maxWidth < 600 || constraints.maxHeight < 500;
+            return PortalBackground(
+              child: Scaffold(
+                backgroundColor: Colors.transparent,
+                body: SafeArea(
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: mobile ? 16 : 24,
+                          vertical: mobile ? 8 : 16,
+                        ),
+                        child: SizedBox(
+                          height: mobile ? 36 : 48,
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: SizedBox(
+                              width: mobile ? 170 : 210,
+                              child: const BrandMark(compact: true),
                             ),
                           ),
-                        ],
+                        ),
                       ),
-                    ),
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(
+                          mobile ? 16 : 24,
+                          mobile ? 4 : 49,
+                          mobile ? 16 : 24,
+                          mobile ? 8 : 16,
+                        ),
+                        child: Center(
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(maxWidth: 1100),
+                            child: Row(
+                              children: [
+                                IconButton.filledTonal(
+                                  key: backKey,
+                                  constraints: const BoxConstraints(
+                                    minWidth: 48,
+                                    minHeight: 48,
+                                  ),
+                                  tooltip: 'Voltar para a tela principal',
+                                  onPressed: () => Navigator.pop(context),
+                                  icon: const Icon(Icons.arrow_back),
+                                ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: Text(
+                                    title,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: mobile
+                                        ? Theme.of(context).textTheme.titleLarge
+                                        : Theme.of(
+                                            context,
+                                          ).textTheme.headlineSmall,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: Center(
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(maxWidth: 1100),
+                            child: builder(context),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                Expanded(
-                  child: Center(
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 1100),
-                      child: builder(context),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
+              ),
+            );
+          },
+        );
+      },
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         final progress = CurvedAnimation(
           parent: animation,
@@ -106,6 +115,8 @@ Future<void> openCardPage(
           animation: progress,
           child: child,
           builder: (context, child) {
+            if (animation.status == AnimationStatus.completed) return child!;
+            final bounds = Offset.zero & MediaQuery.sizeOf(context);
             final returning = animation.status == AnimationStatus.reverse;
             final backBox = backKey.currentContext?.findRenderObject();
             final target = returning && backBox is RenderBox && backBox.hasSize
