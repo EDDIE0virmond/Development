@@ -16,7 +16,10 @@ void main() {
           if (request.url.path.endsWith('/login'))
             return jsonResponse(session('token'));
           if (request.url.path.endsWith('/insights')) {
-            return jsonResponse({'series': [], 'timezone': 'America/Sao_Paulo'});
+            return jsonResponse({
+              'series': [],
+              'timezone': 'America/Sao_Paulo',
+            });
           }
           if (request.url.path.endsWith('/energy')) {
             queries++;
@@ -52,13 +55,15 @@ void main() {
       await tester.tap(find.text('Ver gráficos e detalhes'));
       await tester.pumpAndSettle();
       expect(queries, 1);
-      expect(find.byType(Dialog), findsOneWidget);
+      expect(find.byType(Dialog), findsNothing);
+      expect(find.byType(BackButton), findsOneWidget);
       expect(find.text('Energia do dia'), findsOneWidget);
       expect(find.text('Energia do mês'), findsOneWidget);
       expect(find.text('Consumo: Não disponível'), findsNWidgets(2));
-      await tester.tap(find.byTooltip('Fechar detalhes'));
+      await tester.tap(find.byType(BackButton));
       await tester.pumpAndSettle();
-      expect(find.byType(Dialog), findsNothing);      await tester.pumpWidget(const SizedBox());
+      expect(find.byType(Dialog), findsNothing);
+      await tester.pumpWidget(const SizedBox());
       api.dispose();
     },
   );

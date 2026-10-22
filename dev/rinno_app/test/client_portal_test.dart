@@ -106,7 +106,7 @@ void main() {
       300,
       scrollable: find
           .descendant(
-            of: find.byType(Dialog),
+            of: find.byType(Scaffold).last,
             matching: find.byType(Scrollable),
           )
           .first,

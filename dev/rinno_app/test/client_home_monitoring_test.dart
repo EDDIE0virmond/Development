@@ -69,13 +69,12 @@ void main() {
       expect(tester.takeException(), isNull);
       await tester.tap(find.text('Ver instalação'));
       await tester.pumpAndSettle();
-      final dialog = tester.widget<Dialog>(find.byType(Dialog));
-      expect(dialog.insetPadding, const EdgeInsets.symmetric(horizontal: 16, vertical: 24));
-      expect((dialog.shape as RoundedRectangleBorder).borderRadius, BorderRadius.circular(26));
+      expect(find.byType(Dialog), findsNothing);
+      expect(find.text('Minha instalação'), findsOneWidget);
       tester.view.physicalSize = const Size(390, 844);
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
-      await tester.tap(find.byTooltip('Fechar instalação'));
+      await tester.tap(find.byType(BackButton));
       await tester.pumpAndSettle();
       expect(find.byType(Dialog), findsNothing);
       await tester.pumpWidget(const SizedBox());

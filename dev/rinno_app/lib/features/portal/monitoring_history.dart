@@ -28,6 +28,9 @@ class _MonitoringHistoryState extends State<MonitoringHistory> {
 
   Future<Map<String, dynamic>> load() {
     final date = iso(queryDate);
+    if (!cache.containsKey('$date/$serial') && cache.length >= 12) {
+      cache.remove(cache.keys.first);
+    }
     return cache.putIfAbsent(
       '$date/$serial',
       () => widget.api.monitoringHistory(widget.id, date, serial: serial),
@@ -193,9 +196,11 @@ class _MonitoringHistoryState extends State<MonitoringHistory> {
               if (points.any((p) => p['value'] is num)) ...[
                 SizedBox(
                   height: 190,
-                  child: CustomPaint(
-                    painter: _HistoryPainter(points, monthly),
-                    child: const SizedBox.expand(),
+                  child: RepaintBoundary(
+                    child: CustomPaint(
+                      painter: _HistoryPainter(points, monthly),
+                      child: const SizedBox.expand(),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -207,26 +212,33 @@ class _MonitoringHistoryState extends State<MonitoringHistory> {
                 ),
                 ExpansionTile(
                   title: const Text('Ver leituras e horários'),
-                  children: points
-                      .map(
-                        (p) => Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 5,
-                          ),
-                          child: Row(
-                            children: [
-                              Expanded(child: Text('${p['time']}')),
-                              Text(
-                                p['value'] is num
-                                    ? '${(p['value'] as num).toStringAsFixed(2)} $unit'
-                                    : 'Não disponível',
-                              ),
-                            ],
-                          ),
-                        ),
-                      )
-                      .toList(),
+                  children: [
+                    SizedBox(
+                      height: 240,
+                      child: ListView.builder(
+                        itemCount: points.length,
+                        itemBuilder: (context, index) {
+                          final p = points[index];
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
+                            child: Row(
+                              children: [
+                                Expanded(child: Text('${p['time']}')),
+                                Text(
+                                  p['value'] is num
+                                      ? '${(p['value'] as num).toStringAsFixed(2)} $unit'
+                                      : 'Não disponível',
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 ),
               ] else
                 const Padding(

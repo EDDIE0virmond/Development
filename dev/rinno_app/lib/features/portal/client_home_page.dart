@@ -1,3 +1,4 @@
+import 'card_detail_page.dart';
 import 'completed_stages_timeline.dart';
 import 'client_monitoring.dart';
 import 'package:flutter/material.dart';
@@ -17,50 +18,14 @@ class ClientHomePage extends StatefulWidget {
 class _ClientHomePageState extends State<ClientHomePage> {
   late Future<InstallationPage> page = widget.api.installations();
   final List<Installation> previous = [];
+  final cardKeys = <String, GlobalKey>{};
   void openProject(String id) {
-    showDialog<void>(
-      context: context,
-      builder: (context) => Dialog(
-        backgroundColor: AppTheme.navy,
-        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(26)),
-        clipBehavior: Clip.antiAlias,
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 760),
-          child: SizedBox(
-            height: MediaQuery.sizeOf(context).height * .85,
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 12, 12, 0),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          'Minha instalação',
-                          style: Theme.of(context).textTheme.titleLarge,
-                        ),
-                      ),
-                      IconButton(
-                        tooltip: 'Fechar instalação',
-                        onPressed: () => Navigator.pop(context),
-                        icon: const Icon(Icons.close),
-                      ),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: _Detail(
-                    api: widget.api,
-                    id: id,
-                    back: () => Navigator.pop(context),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
+    openCardPage(
+      context,
+      title: 'Minha instalação',
+      origin: cardKeys[id]?.currentContext,
+      builder: (context) =>
+          _Detail(api: widget.api, id: id, back: () => Navigator.pop(context)),
     );
   }
 
@@ -189,6 +154,10 @@ class _ClientHomePageState extends State<ClientHomePage> {
                         Padding(
                           padding: const EdgeInsets.only(bottom: 16),
                           child: GlassSurface(
+                            key: cardKeys.putIfAbsent(
+                              item.id,
+                              () => GlobalKey(),
+                            ),
                             blur: false,
                             padding: EdgeInsets.zero,
                             child: Material(

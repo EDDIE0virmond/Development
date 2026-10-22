@@ -1,3 +1,4 @@
+import 'card_detail_page.dart';
 import 'package:flutter/material.dart';
 import 'monitoring_history.dart';
 import '../../core/network/app_api.dart';
@@ -101,68 +102,32 @@ class _PlantEnergyState extends State<_PlantEnergy> {
       widget.api.monitoringEnergy(widget.plant['id'] as String);
 
   void openDetails() {
-    showDialog<void>(
-      context: context,
+    openCardPage(
+      context,
+      title: widget.plant['name'] as String,
       builder: (context) => StatefulBuilder(
-        builder: (context, updateDialog) {
-          return Dialog(
-            backgroundColor: AppTheme.navy,
-            insetPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 24,
-            ),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(26),
-            ),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 760),
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            widget.plant['name'] as String,
-                            style: Theme.of(context).textTheme.titleLarge,
-                          ),
-                        ),
-                        IconButton(
-                          tooltip: 'Fechar detalhes',
-                          onPressed: () => Navigator.pop(context),
-                          icon: const Icon(Icons.close),
-                        ),
-                      ],
-                    ),
-                    Flexible(
-                      child: SingleChildScrollView(
-                        child: Column(
-                          children: [
-                            MonitoringHistory(
-                              api: widget.api,
-                              id: widget.plant['id'] as String,
-                            ),
-                            _reportView(details: true),
-                          ],
-                        ),
-                      ),
-                    ),
-                    TextButton.icon(
-                      icon: const Icon(Icons.refresh),
-                      label: const Text('Atualizar leitura'),
-                      onPressed: () {
-                        setState(() => report = load());
-                        updateDialog(() {});
-                      },
-                    ),
-                  ],
-                ),
+        builder: (context, updatePage) => SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              MonitoringHistory(
+                api: widget.api,
+                id: widget.plant['id'] as String,
               ),
-            ),
-          );
-        },
+              _reportView(details: true),
+              const SizedBox(height: 24),
+              TextButton.icon(
+                icon: const Icon(Icons.refresh),
+                label: const Text('Atualizar leitura'),
+                onPressed: () {
+                  setState(() => report = load());
+                  updatePage(() {});
+                },
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
