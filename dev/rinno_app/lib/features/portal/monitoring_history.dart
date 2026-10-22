@@ -260,11 +260,6 @@ class _MonitoringHistoryState extends State<MonitoringHistory> {
                     style: const TextStyle(color: AppTheme.muted),
                   ),
                 ),
-              const Divider(height: 32),
-              const Text(
-                'Resumo atual',
-                style: TextStyle(fontWeight: FontWeight.w600),
-              ),
             ],
           );
         },

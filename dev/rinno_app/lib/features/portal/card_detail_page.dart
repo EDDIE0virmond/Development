@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/theme/widgets/glass_surface.dart';
 
 /// Expands the selected card into an opaque, readable page, reversing on back.
 Future<void> openCardPage(
@@ -22,20 +23,30 @@ Future<void> openCardPage(
       reverseTransitionDuration: Duration(
         milliseconds: reducedMotion ? 0 : 300,
       ),
-      pageBuilder: (context, animation, secondaryAnimation) => Scaffold(
-        backgroundColor: AppTheme.navy,
-        appBar: AppBar(
-          backgroundColor: AppTheme.navy,
-          surfaceTintColor: Colors.transparent,
-          leading: BackButton(onPressed: () => Navigator.pop(context)),
-          title: Text(title, maxLines: 2, overflow: TextOverflow.ellipsis),
-        ),
-        body: SafeArea(
-          top: false,
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 1100),
-              child: builder(context),
+      pageBuilder: (context, animation, secondaryAnimation) => PortalBackground(
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          appBar: AppBar(
+            backgroundColor: AppTheme.navy.withValues(alpha: .84),
+            elevation: 0,
+            bottom: PreferredSize(
+              preferredSize: const Size.fromHeight(1),
+              child: Container(
+                height: 1,
+                color: Colors.white.withValues(alpha: .16),
+              ),
+            ),
+            surfaceTintColor: Colors.transparent,
+            leading: BackButton(onPressed: () => Navigator.pop(context)),
+            title: Text(title, maxLines: 2, overflow: TextOverflow.ellipsis),
+          ),
+          body: SafeArea(
+            top: false,
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 1100),
+                child: builder(context),
+              ),
             ),
           ),
         ),

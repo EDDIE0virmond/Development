@@ -111,11 +111,26 @@ class _PlantEnergyState extends State<_PlantEnergy> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              MonitoringHistory(
-                api: widget.api,
-                id: widget.plant['id'] as String,
+              GlassSurface(
+                child: MonitoringHistory(
+                  api: widget.api,
+                  id: widget.plant['id'] as String,
+                ),
               ),
-              _reportView(details: true),
+              const SizedBox(height: 20),
+              GlassSurface(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      'Resumo atual',
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                    const SizedBox(height: 16),
+                    _reportView(details: true),
+                  ],
+                ),
+              ),
               const SizedBox(height: 24),
               TextButton.icon(
                 icon: const Icon(Icons.refresh),
