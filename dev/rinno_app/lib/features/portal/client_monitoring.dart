@@ -127,7 +127,9 @@ class _PlantEnergyState extends State<_PlantEnergy> {
                       'Resumo atual',
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(
+                      height: MediaQuery.sizeOf(context).width < 600 ? 8 : 16,
+                    ),
                     _reportView(details: true),
                   ],
                 ),
@@ -183,10 +185,11 @@ class _PlantEnergyState extends State<_PlantEnergy> {
       }
       final data = snapshot.data!;
       final period = data['period'] as Map?;
+      final compact = details && MediaQuery.sizeOf(context).width < 600;
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const SizedBox(height: 20),
+          SizedBox(height: compact ? 0 : 20),
           Wrap(
             spacing: 28,
             runSpacing: 16,
@@ -218,18 +221,55 @@ class _PlantEnergyState extends State<_PlantEnergy> {
               style: TextStyle(color: Colors.amber),
             ),
           if (details) ...[
-            const SizedBox(height: 24),
-            Text(
-              'Fornecedor: ${(widget.plant['provider'] as String).toUpperCase()}',
-            ),
-            Text('Dia de referência: ${period?['day'] ?? 'Não informado'}'),
-            Text('Fuso horário: ${period?['timezone'] ?? 'Não informado'}'),
-            Text('Última consulta: ${data['fetchedAt'] ?? 'Não informada'}'),
-            const SizedBox(height: 12),
-            const Text(
-              'Geração acumulada na última leitura disponível. O mês atual está em andamento.',
-              style: TextStyle(color: AppTheme.muted, fontSize: 12),
-            ),
+            SizedBox(height: compact ? 4 : 24),
+            if (compact)
+              ExpansionTile(
+                tilePadding: EdgeInsets.zero,
+                childrenPadding: const EdgeInsets.only(bottom: 8),
+                dense: true,
+                minTileHeight: 36,
+                title: const Text(
+                  'Detalhes da leitura',
+                  style: TextStyle(fontSize: 12),
+                ),
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Text(
+                        'Fornecedor: ${(widget.plant['provider'] as String).toUpperCase()}',
+                      ),
+                      Text(
+                        'Dia de referência: ${period?['day'] ?? 'Não informado'}',
+                      ),
+                      Text(
+                        'Fuso horário: ${period?['timezone'] ?? 'Não informado'}',
+                      ),
+                      Text(
+                        'Última consulta: ${data['fetchedAt'] ?? 'Não informada'}',
+                      ),
+                      const SizedBox(height: 12),
+                      const Text(
+                        'Geração acumulada na última leitura disponível. O mês atual está em andamento.',
+                        style: TextStyle(color: AppTheme.muted, fontSize: 12),
+                      ),
+                    ],
+                  ),
+                ],
+              )
+            else ...[
+              Text(
+                'Fornecedor: ${(widget.plant['provider'] as String).toUpperCase()}',
+              ),
+              Text('Dia de referência: ${period?['day'] ?? 'Não informado'}'),
+              Text('Fuso horário: ${period?['timezone'] ?? 'Não informado'}'),
+              Text('Última consulta: ${data['fetchedAt'] ?? 'Não informada'}'),
+              const SizedBox(height: 12),
+              const Text(
+                'Geração acumulada na última leitura disponível. O mês atual está em andamento.',
+                style: TextStyle(color: AppTheme.muted, fontSize: 12),
+              ),
+            ],
           ],
         ],
       );
