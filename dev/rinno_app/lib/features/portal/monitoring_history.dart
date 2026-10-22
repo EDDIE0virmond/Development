@@ -208,7 +208,7 @@ class _MonitoringHistoryState extends State<MonitoringHistory> {
                   monthly
                       ? 'Leituras por dia do mês'
                       : 'Leituras por horário do dia',
-                  style: const TextStyle(color: AppTheme.muted),
+                  style: const TextStyle(color: Color(0xFFD6E5F0)),
                 ),
                 ExpansionTile(
                   title: const Text('Ver leituras e horários'),
@@ -250,14 +250,14 @@ class _MonitoringHistoryState extends State<MonitoringHistory> {
               if (selected?['timezone'] != null || data['timezone'] != null)
                 Text(
                   'Fuso: ${selected?['timezone'] ?? data['timezone']}',
-                  style: const TextStyle(color: AppTheme.muted),
+                  style: const TextStyle(color: Color(0xFFD6E5F0)),
                 ),
               for (final note in (data['notes'] as List? ?? []))
                 Padding(
                   padding: const EdgeInsets.only(top: 8),
                   child: Text(
                     '$note',
-                    style: const TextStyle(color: AppTheme.muted),
+                    style: const TextStyle(color: Color(0xFFD6E5F0)),
                   ),
                 ),
             ],
@@ -291,7 +291,7 @@ class _HistoryPainter extends CustomPainter {
       final text = TextPainter(
         text: TextSpan(
           text: s,
-          style: const TextStyle(color: AppTheme.muted, fontSize: 10),
+          style: const TextStyle(color: Color(0xFFD6E5F0), fontSize: 10),
         ),
         textDirection: TextDirection.ltr,
       )..layout();

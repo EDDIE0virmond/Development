@@ -74,7 +74,7 @@ void main() {
       tester.view.physicalSize = const Size(390, 844);
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
-      await tester.tap(find.byType(BackButton));
+      await tester.tap(find.byTooltip('Voltar para a tela principal'));
       await tester.pumpAndSettle();
       expect(find.byType(Dialog), findsNothing);
       await tester.pumpWidget(const SizedBox());

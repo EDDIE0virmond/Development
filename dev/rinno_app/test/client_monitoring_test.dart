@@ -56,11 +56,15 @@ void main() {
       await tester.pumpAndSettle();
       expect(queries, 1);
       expect(find.byType(Dialog), findsNothing);
-      expect(find.byType(BackButton), findsOneWidget);
-      expect(find.text('Energia do dia'), findsOneWidget);
-      expect(find.text('Energia do mês'), findsOneWidget);
-      expect(find.text('Consumo: Não disponível'), findsNWidgets(2));
-      await tester.tap(find.byType(BackButton));
+      expect(find.byTooltip('Voltar para a tela principal'), findsOneWidget);
+      expect(find.text('Resumo atual'), findsOneWidget);
+      expect(find.text('Histórico de geração'), findsOneWidget);
+      expect(find.textContaining('Consumo:'), findsNothing);
+      expect(
+        tester.getTopLeft(find.text('Resumo atual')).dy,
+        lessThan(tester.getTopLeft(find.text('Histórico de geração')).dy),
+      );
+      await tester.tap(find.byTooltip('Voltar para a tela principal'));
       await tester.pumpAndSettle();
       expect(find.byType(Dialog), findsNothing);
       await tester.pumpWidget(const SizedBox());

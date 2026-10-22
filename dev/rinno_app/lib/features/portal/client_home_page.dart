@@ -24,8 +24,7 @@ class _ClientHomePageState extends State<ClientHomePage> {
       context,
       title: 'Minha instalação',
       origin: cardKeys[id]?.currentContext,
-      builder: (context) =>
-          _Detail(api: widget.api, id: id, back: () => Navigator.pop(context)),
+      builder: (context) => _Detail(api: widget.api, id: id),
     );
   }
 
@@ -48,7 +47,7 @@ class _ClientHomePageState extends State<ClientHomePage> {
             const Expanded(
               child: Align(
                 alignment: Alignment.centerLeft,
-                child: BrandMark(compact: true),
+                child: SizedBox(height: 48, child: BrandMark(compact: true)),
               ),
             ),
             IconButton(
@@ -282,8 +281,7 @@ class _Error extends StatelessWidget {
 class _Detail extends StatefulWidget {
   final AppApi api;
   final String id;
-  final VoidCallback back;
-  const _Detail({required this.api, required this.id, required this.back});
+  const _Detail({required this.api, required this.id});
   @override
   State<_Detail> createState() => _DetailState();
 }
@@ -395,15 +393,6 @@ class _DetailState extends State<_Detail> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: TextButton.icon(
-                        onPressed: widget.back,
-                        icon: const Icon(Icons.arrow_back),
-                        label: const Text('Minhas instalações'),
-                      ),
-                    ),
-                    const SizedBox(height: 24),
                     Text(
                       installation.codigo,
                       style: Theme.of(context).textTheme.headlineLarge,

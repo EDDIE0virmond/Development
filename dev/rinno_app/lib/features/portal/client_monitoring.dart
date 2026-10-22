@@ -112,13 +112,6 @@ class _PlantEnergyState extends State<_PlantEnergy> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               GlassSurface(
-                child: MonitoringHistory(
-                  api: widget.api,
-                  id: widget.plant['id'] as String,
-                ),
-              ),
-              const SizedBox(height: 20),
-              GlassSurface(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -129,6 +122,13 @@ class _PlantEnergyState extends State<_PlantEnergy> {
                     const SizedBox(height: 16),
                     _reportView(details: true),
                   ],
+                ),
+              ),
+              const SizedBox(height: 20),
+              GlassSurface(
+                child: MonitoringHistory(
+                  api: widget.api,
+                  id: widget.plant['id'] as String,
                 ),
               ),
               const SizedBox(height: 24),
@@ -208,18 +208,6 @@ class _PlantEnergyState extends State<_PlantEnergy> {
             ),
           if (details) ...[
             const SizedBox(height: 24),
-            _EnergyComparison(
-              title: 'Energia do dia',
-              generation: data['generationToday'],
-              consumption: data['consumptionToday'],
-            ),
-            const SizedBox(height: 24),
-            _EnergyComparison(
-              title: 'Energia do mês',
-              generation: data['generationMonth'],
-              consumption: data['consumptionMonth'],
-            ),
-            const SizedBox(height: 24),
             Text(
               'Fornecedor: ${(widget.plant['provider'] as String).toUpperCase()}',
             ),
@@ -228,7 +216,7 @@ class _PlantEnergyState extends State<_PlantEnergy> {
             Text('Última consulta: ${data['fetchedAt'] ?? 'Não informada'}'),
             const SizedBox(height: 12),
             const Text(
-              'Os gráficos comparam os totais disponíveis de cada período. O mês atual está em andamento. Consumo não disponível não significa zero.',
+              'Geração acumulada na última leitura disponível. O mês atual está em andamento.',
               style: TextStyle(color: AppTheme.muted, fontSize: 12),
             ),
           ],
@@ -276,64 +264,4 @@ class _PlantEnergyState extends State<_PlantEnergy> {
       ),
     ),
   );
-}
-
-class _EnergyComparison extends StatelessWidget {
-  final String title;
-  final dynamic generation, consumption;
-  const _EnergyComparison({
-    required this.title,
-    this.generation,
-    this.consumption,
-  });
-  @override
-  Widget build(BuildContext context) {
-    final values = [
-      generation,
-      consumption,
-    ].whereType<num>().where((v) => v.isFinite && v >= 0);
-    final maximum = values.fold<double>(
-      0,
-      (previous, value) => value > previous ? value.toDouble() : previous,
-    );
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Text(title, style: Theme.of(context).textTheme.titleMedium),
-        const SizedBox(height: 12),
-        for (final entry in {
-          'Geração': generation,
-          'Consumo': consumption,
-        }.entries)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text('${entry.key}: ${_energy(entry.value)}'),
-                const SizedBox(height: 6),
-                if (entry.value is num &&
-                    (entry.value as num).isFinite &&
-                    entry.value >= 0)
-                  ExcludeSemantics(
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(6),
-                      child: LinearProgressIndicator(
-                        value: maximum == 0
-                            ? 0
-                            : (entry.value as num) / maximum,
-                        minHeight: 14,
-                        color: entry.key == 'Geração'
-                            ? AppTheme.lime
-                            : Colors.lightBlueAccent,
-                        backgroundColor: Colors.white10,
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-          ),
-      ],
-    );
-  }
 }

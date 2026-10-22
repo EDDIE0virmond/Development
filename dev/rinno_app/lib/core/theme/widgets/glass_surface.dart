@@ -27,7 +27,7 @@ class GlassSurface extends StatelessWidget {
             const Color(0xFF0B192B).withValues(alpha: .90),
           ],
         ),
-        border: Border.all(color: Colors.white.withValues(alpha: .30)),
+        border: Border.all(color: Colors.white.withValues(alpha: .38)),
       ),
       child: child,
     );

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../core/theme/app_theme.dart';
 import '../../core/theme/widgets/glass_surface.dart';
 
 /// Expands the selected card into an opaque, readable page, reversing on back.
@@ -26,27 +25,54 @@ Future<void> openCardPage(
       pageBuilder: (context, animation, secondaryAnimation) => PortalBackground(
         child: Scaffold(
           backgroundColor: Colors.transparent,
-          appBar: AppBar(
-            backgroundColor: AppTheme.navy.withValues(alpha: .84),
-            elevation: 0,
-            bottom: PreferredSize(
-              preferredSize: const Size.fromHeight(1),
-              child: Container(
-                height: 1,
-                color: Colors.white.withValues(alpha: .16),
-              ),
-            ),
-            surfaceTintColor: Colors.transparent,
-            leading: BackButton(onPressed: () => Navigator.pop(context)),
-            title: Text(title, maxLines: 2, overflow: TextOverflow.ellipsis),
-          ),
           body: SafeArea(
-            top: false,
-            child: Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 1100),
-                child: builder(context),
-              ),
+            child: Column(
+              children: [
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                  child: SizedBox(
+                    height: 48,
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: BrandMark(compact: true),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(24, 49, 24, 16),
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 1100),
+                      child: Row(
+                        children: [
+                          IconButton.filledTonal(
+                            tooltip: 'Voltar para a tela principal',
+                            onPressed: () => Navigator.pop(context),
+                            icon: const Icon(Icons.arrow_back),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Text(
+                              title,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: Theme.of(context).textTheme.headlineSmall,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 1100),
+                      child: builder(context),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ),
