@@ -187,7 +187,7 @@ class _ClientHomePageState extends State<ClientHomePage> {
                                       Row(
                                         children: [
                                           const Icon(
-                                            Icons.solar_power_outlined,
+                                            Icons.settings_outlined,
                                             color: AppTheme.lime,
                                           ),
                                           const SizedBox(width: 12),
