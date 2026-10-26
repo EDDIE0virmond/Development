@@ -10,12 +10,16 @@ class PlantService {
   // Buscar todas as plantas de um usuário específico
   Future<List<Plant>> getPlantsByUser(int userId) async {
     try {
-      final uri = Uri.parse('${ApiConstants.baseUrl}/get_user_plants.php?user_id=$userId');
-      
-      final response = await _client.get(uri).timeout(
-        const Duration(seconds: 30),
-        onTimeout: () => throw Exception('Tempo limite excedido'),
+      final uri = Uri.parse(
+        '${ApiConstants.baseUrl}/get_user_plants.php?user_id=$userId',
       );
+
+      final response = await _client
+          .get(uri)
+          .timeout(
+            const Duration(seconds: 30),
+            onTimeout: () => throw Exception('Tempo limite excedido'),
+          );
 
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
@@ -32,11 +36,13 @@ class PlantService {
   Future<List<Plant>> getAllPlants() async {
     try {
       final uri = Uri.parse(ApiConstants.getAllPlantsEndpoint);
-      
-      final response = await _client.get(uri).timeout(
-        const Duration(seconds: 30),
-        onTimeout: () => throw Exception('Tempo limite excedido'),
-      );
+
+      final response = await _client
+          .get(uri)
+          .timeout(
+            const Duration(seconds: 30),
+            onTimeout: () => throw Exception('Tempo limite excedido'),
+          );
 
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
@@ -52,12 +58,16 @@ class PlantService {
   // Buscar uma planta específica
   Future<Plant> getPlantById(int plantId) async {
     try {
-      final uri = Uri.parse('${ApiConstants.baseUrl}/get_plant.php?plant_id=$plantId');
-      
-      final response = await _client.get(uri).timeout(
-        const Duration(seconds: 30),
-        onTimeout: () => throw Exception('Tempo limite excedido'),
+      final uri = Uri.parse(
+        '${ApiConstants.baseUrl}/get_plant.php?plant_id=$plantId',
       );
+
+      final response = await _client
+          .get(uri)
+          .timeout(
+            const Duration(seconds: 30),
+            onTimeout: () => throw Exception('Tempo limite excedido'),
+          );
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = jsonDecode(response.body);
@@ -85,7 +95,7 @@ class PlantService {
   ]) async {
     try {
       final uri = Uri.parse(ApiConstants.createPlantEndpoint);
-      
+
       final body = jsonEncode({
         'user_id': userId,
         'nome': nome,
@@ -98,24 +108,13 @@ class PlantService {
         'nome_inversor': nomeInversor,
         'quantidade_inversores': quantidadeInversores,
       });
-      
-      print('=== CRIANDO PLANTA ===');
-      print('Body: $body');
-      print('========================');
-      
-      final response = await _client.post(
-        uri,
-        headers: {'Content-Type': 'application/json'},
-        body: body,
-      ).timeout(
-        const Duration(seconds: 30),
-        onTimeout: () => throw Exception('Tempo limite excedido'),
-      );
 
-      print('=== RESPOSTA ===');
-      print('Status: ${response.statusCode}');
-      print('Body: ${response.body}');
-      print('========================');
+      final response = await _client
+          .post(uri, headers: {'Content-Type': 'application/json'}, body: body)
+          .timeout(
+            const Duration(seconds: 30),
+            onTimeout: () => throw Exception('Tempo limite excedido'),
+          );
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = jsonDecode(response.body);
@@ -124,7 +123,6 @@ class PlantService {
         return false;
       }
     } catch (e) {
-      print('Erro ao criar planta: $e');
       return false;
     }
   }
@@ -145,27 +143,29 @@ class PlantService {
   ) async {
     try {
       final uri = Uri.parse(ApiConstants.updatePlantEndpoint);
-      
-      final response = await _client.post(
-        uri,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'plant_id': plantId,
-          'nome': nome,
-          'descricao': descricao,
-          'potencia': potencia,
-          'localizacao': localizacao,
-          'status': status,
-          'quantidade_placas': quantidadePlacas,
-          'nome_placa': nomePlaca,
-          'tipo_inversor': tipoInversor,
-          'nome_inversor': nomeInversor,
-          'quantidade_inversores': quantidadeInversores,
-        }),
-      ).timeout(
-        const Duration(seconds: 30),
-        onTimeout: () => throw Exception('Tempo limite excedido'),
-      );
+
+      final response = await _client
+          .post(
+            uri,
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({
+              'plant_id': plantId,
+              'nome': nome,
+              'descricao': descricao,
+              'potencia': potencia,
+              'localizacao': localizacao,
+              'status': status,
+              'quantidade_placas': quantidadePlacas,
+              'nome_placa': nomePlaca,
+              'tipo_inversor': tipoInversor,
+              'nome_inversor': nomeInversor,
+              'quantidade_inversores': quantidadeInversores,
+            }),
+          )
+          .timeout(
+            const Duration(seconds: 30),
+            onTimeout: () => throw Exception('Tempo limite excedido'),
+          );
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = jsonDecode(response.body);
@@ -182,15 +182,17 @@ class PlantService {
   Future<bool> deletePlant(int plantId) async {
     try {
       final uri = Uri.parse(ApiConstants.deletePlantEndpoint);
-      
-      final response = await _client.post(
-        uri,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'plant_id': plantId}),
-      ).timeout(
-        const Duration(seconds: 30),
-        onTimeout: () => throw Exception('Tempo limite excedido'),
-      );
+
+      final response = await _client
+          .post(
+            uri,
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({'plant_id': plantId}),
+          )
+          .timeout(
+            const Duration(seconds: 30),
+            onTimeout: () => throw Exception('Tempo limite excedido'),
+          );
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = jsonDecode(response.body);

@@ -24,15 +24,21 @@ class _MyAppState extends State<MyApp> {
   }
 
   @override
-  Widget build(BuildContext context) => MaterialApp(
-    title: 'Rinnovare | Minha energia',
-    debugShowCheckedModeBanner: false,
-    theme: AppTheme.dark,
-    // Unknown/deprecated administrative URLs always resolve to the client gate.
-    onGenerateInitialRoutes: (_) => [
-      MaterialPageRoute(builder: (_) => ClientPortal(api: api)),
-    ],
-    onGenerateRoute: (_) =>
+  Widget build(BuildContext context) => AnimatedBuilder(
+    animation: api,
+    builder: (context, _) => MaterialApp(
+      // Private routes belong to one authenticated user. Recreate the navigator
+      // on logout/revocation/account change, but preserve it during token refresh.
+      key: ValueKey(api.user?.id),
+      title: 'Rinnovare | Minha energia',
+      debugShowCheckedModeBanner: false,
+      theme: AppTheme.dark,
+      // Unknown/deprecated administrative URLs always resolve to the client gate.
+      onGenerateInitialRoutes: (_) => [
         MaterialPageRoute(builder: (_) => ClientPortal(api: api)),
+      ],
+      onGenerateRoute: (_) =>
+          MaterialPageRoute(builder: (_) => ClientPortal(api: api)),
+    ),
   );
 }

@@ -11,30 +11,22 @@ class AuthService {
   Future<LoginResponse> login(LoginRequest request) async {
     try {
       final uri = Uri.parse(ApiConstants.loginEndpoint);
-      
-      final body = jsonEncode(request.toJson());
-      
-      print('=== ENVIANDO REQUISIÇÃO ===');
-      print('URL: $uri');
-      print('Body: $body');
-      print('===========================');
-      
-      final response = await _client.post(
-        uri,
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        body: body,
-      ).timeout(
-        const Duration(seconds: 30),
-        onTimeout: () => throw Exception('Tempo limite excedido'),
-      );
 
-      print('=== RESPOSTA RECEBIDA ===');
-      print('Status code: ${response.statusCode}');
-      print('Response body: ${response.body}');
-      print('=========================');
+      final body = jsonEncode(request.toJson());
+
+      final response = await _client
+          .post(
+            uri,
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+            },
+            body: body,
+          )
+          .timeout(
+            const Duration(seconds: 30),
+            onTimeout: () => throw Exception('Tempo limite excedido'),
+          );
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = jsonDecode(response.body);
@@ -46,9 +38,6 @@ class AuthService {
         );
       }
     } catch (e) {
-      print('=== ERRO NA REQUISIÇÃO ===');
-      print('Erro: $e');
-      print('==========================');
       return LoginResponse(
         success: false,
         message: 'Erro de conexão: ${e.toString()}',

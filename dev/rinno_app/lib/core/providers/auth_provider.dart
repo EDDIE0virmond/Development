@@ -1,5 +1,4 @@
 // lib/core/providers/auth_provider.dart
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../network/auth_service.dart';
@@ -9,7 +8,7 @@ import '../constants/api_constants.dart';
 
 class AuthProvider extends ChangeNotifier {
   final AuthService _authService = AuthService();
-  
+
   UserModel? _currentUser;
   bool _isLoading = false;
   bool _isAuthenticated = false;
@@ -19,7 +18,7 @@ class AuthProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   bool get isAuthenticated => _isAuthenticated;
   String? get errorMessage => _errorMessage;
-  
+
   // Getters para verificar permissões
   bool get isAdmin => _currentUser?.role == 'admin';
   bool get isMaster => _currentUser?.role == 'master';
@@ -31,32 +30,17 @@ class AuthProvider extends ChangeNotifier {
     _loadStoredSession();
   }
 
+  // Legacy serialized profiles are not proof of authentication. Never restore
+  // roles or a signed-in state from editable, unencrypted preferences.
   Future<void> _loadStoredSession() async {
+    _currentUser = null;
+    _isAuthenticated = false;
     try {
       final prefs = await SharedPreferences.getInstance();
-      final userJson = prefs.getString(ApiConstants.userDataKey);
-      
-      print('Carregando sessão - userJson: $userJson');
-      
-      if (userJson != null && userJson.isNotEmpty) {
-        final Map<String, dynamic> userData = jsonDecode(userJson);
-        _currentUser = UserModel.fromJson(userData);
-        _isAuthenticated = true;
-        
-        print('Usuário carregado: ${_currentUser?.nome}, Role: ${_currentUser?.role}');
-        print('Pode criar usuários: ${canCreateUsers}');
-        
-        notifyListeners();
-      } else {
-        print('Nenhuma sessão encontrada');
-        _currentUser = null;
-        _isAuthenticated = false;
-        notifyListeners();
-      }
-    } catch (e) {
-      print('Erro ao carregar sessão: $e');
-      _currentUser = null;
-      _isAuthenticated = false;
+      await prefs.remove(ApiConstants.userDataKey);
+    } catch (_) {
+      // A storage failure must leave the legacy client signed out.
+    } finally {
       notifyListeners();
     }
   }
@@ -69,27 +53,22 @@ class AuthProvider extends ChangeNotifier {
       final request = LoginRequest(email: email, senha: senha);
       final response = await _authService.login(request);
 
-      print('Resposta do login - success: ${response.success}, role: ${response.role}');
-      print('Dados do usuário: nome: ${response.user?.nome}, email: ${response.user?.email}');
-
       if (response.success && response.user != null) {
-          _currentUser = UserModel(
-            id: response.user!.id,  // Adicionar o id aqui
-            nome: response.user!.nome,
-            email: response.user!.email,
-            role: response.role ?? 'comum',
-          );
-          _isAuthenticated = true;
+        _currentUser = UserModel(
+          id: response.user!.id, // Adicionar o id aqui
+          nome: response.user!.nome,
+          email: response.user!.email,
+          role: response.role ?? 'comum',
+        );
+        _isAuthenticated = true;
 
-          print('Usuário logado: ID=${_currentUser?.id}, Nome=${_currentUser?.nome}, Role=${_currentUser?.role}');
+        if (rememberMe) {
+          await _saveSession();
+        }
 
-          if (rememberMe) {
-            await _saveSession();
-          }
-          
-          _setLoading(false);
-          return true;
-        } else {
+        _setLoading(false);
+        return true;
+      } else {
         _errorMessage = response.message ?? 'Erro ao fazer login';
         _setLoading(false);
         return false;
@@ -102,26 +81,21 @@ class AuthProvider extends ChangeNotifier {
   }
 
   Future<void> _saveSession() async {
-  if (_currentUser == null) return;
-  
-  final prefs = await SharedPreferences.getInstance();
-  final userJson = jsonEncode(_currentUser!.toJson());
-  await prefs.setString(ApiConstants.userDataKey, userJson);
-  
-  print('Sessão salva: $userJson');
-}
+    // The current portal persists only a refresh token through secure storage.
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(ApiConstants.userDataKey);
+  }
 
   Future<void> logout() async {
     _setLoading(true);
-    
+
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(ApiConstants.userDataKey);
-    
+
     _currentUser = null;
     _isAuthenticated = false;
-    
+
     _setLoading(false);
-    print('Logout realizado');
   }
 
   Future<void> refreshUser() async {

@@ -13,30 +13,22 @@ class UserService {
   Future<CreateUserResponse> createUser(CreateUserRequest request) async {
     try {
       final uri = Uri.parse(ApiConstants.registerEndpoint);
-      
-      final body = jsonEncode(request.toJson());
-      
-      print('=== CRIANDO USUÁRIO ===');
-      print('URL: $uri');
-      print('Body: $body');
-      print('========================');
-      
-      final response = await _client.post(
-        uri,
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        body: body,
-      ).timeout(
-        const Duration(seconds: 30),
-        onTimeout: () => throw Exception('Tempo limite excedido'),
-      );
 
-      print('=== RESPOSTA CRIAÇÃO ===');
-      print('Status code: ${response.statusCode}');
-      print('Response body: ${response.body}');
-      print('=========================');
+      final body = jsonEncode(request.toJson());
+
+      final response = await _client
+          .post(
+            uri,
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+            },
+            body: body,
+          )
+          .timeout(
+            const Duration(seconds: 30),
+            onTimeout: () => throw Exception('Tempo limite excedido'),
+          );
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = jsonDecode(response.body);
@@ -48,9 +40,6 @@ class UserService {
         );
       }
     } catch (e) {
-      print('=== ERRO NA CRIAÇÃO ===');
-      print('Erro: $e');
-      print('========================');
       return CreateUserResponse(
         success: false,
         message: 'Erro de conexão: ${e.toString()}',
@@ -62,11 +51,13 @@ class UserService {
   Future<List<SimpleUser>> getAllUsers() async {
     try {
       final uri = Uri.parse(ApiConstants.getAllUsersEndpoint);
-      
-      final response = await _client.get(uri).timeout(
-        const Duration(seconds: 30),
-        onTimeout: () => throw Exception('Tempo limite excedido'),
-      );
+
+      final response = await _client
+          .get(uri)
+          .timeout(
+            const Duration(seconds: 30),
+            onTimeout: () => throw Exception('Tempo limite excedido'),
+          );
 
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
@@ -107,14 +98,18 @@ class UserService {
   Future<List<SimpleUser>> searchUsers(String query) async {
     try {
       final allUsers = await getAllUsers();
-      return allUsers.where((u) => 
-        u.nome.toLowerCase().contains(query.toLowerCase()) ||
-        u.email.toLowerCase().contains(query.toLowerCase())
-      ).toList();
+      return allUsers
+          .where(
+            (u) =>
+                u.nome.toLowerCase().contains(query.toLowerCase()) ||
+                u.email.toLowerCase().contains(query.toLowerCase()),
+          )
+          .toList();
     } catch (e) {
       throw Exception('Erro ao buscar usuários: ${e.toString()}');
     }
   }
+
   Future<List<SimpleUser>> getClientes() async {
     try {
       final allUsers = await getAllUsers();

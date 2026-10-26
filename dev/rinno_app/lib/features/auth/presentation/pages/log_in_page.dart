@@ -46,7 +46,6 @@ class _LogInPageState extends State<LogInPage> {
       await Future.delayed(const Duration(milliseconds: 100));
 
       final role = authProvider.userRole;
-      print('Login bem-sucedido! Role: $role');
 
       if (role == 'admin') {
         Navigator.pushNamedAndRemoveUntil(

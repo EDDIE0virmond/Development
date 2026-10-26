@@ -33,7 +33,9 @@ class _ClientHomePageState extends State<ClientHomePage> {
     try {
       await widget.api.logout();
     } catch (e) {
-      messenger.showSnackBar(SnackBar(content: Text(e.toString())));
+      if (messenger.mounted) {
+        messenger.showSnackBar(SnackBar(content: Text(e.toString())));
+      }
     }
   }
 
