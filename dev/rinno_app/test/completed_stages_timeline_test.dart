@@ -46,4 +46,59 @@ void main() {
     expect(find.text('As etapas concluídas aparecerão aqui.'), findsOneWidget);
     expect(find.byIcon(Icons.check_rounded), findsNothing);
   });
+  for (final width in [320.0, 390.0, 768.0, 1280.0]) {
+    testWidgets('branch graph is read-only and fits width $width', (
+      tester,
+    ) async {
+      tester.view.physicalSize = Size(width, 1000);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      final items =
+          [
+                ['Contrato assinado', 'root'],
+                ['Solicitação de documentos', 'documents'],
+                ['Assinatura de formulários', 'documents'],
+                ['Projeto aprovado', 'documents'],
+                ['Compra de material', 'installation'],
+                ['Chegada de material', 'installation'],
+                ['Agendamento', 'installation'],
+                ['Instalação', 'installation'],
+                ['Vistoria Neoenergia', 'finish'],
+                ['Sistema pronto', 'finish'],
+              ]
+              .map(
+                (s) => InstallationStage.fromJson({
+                  'id': s[0],
+                  'nome': s[0],
+                  'branch': s[1],
+                  'status': 'concluida',
+                }),
+              )
+              .toList();
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: CompletedStagesTimeline(stages: items),
+              ),
+            ),
+          ),
+        ),
+      );
+      expect(tester.takeException(), isNull);
+      expect(find.byIcon(Icons.check_rounded), findsNWidgets(10));
+      expect(find.byType(Checkbox), findsNothing);
+      expect(
+        tester.getTopLeft(find.text('Solicitação de documentos')).dx,
+        lessThan(tester.getTopLeft(find.text('Compra de material')).dx),
+      );
+      expect(
+        tester.getBottomRight(find.text('Compra de material')).dx,
+        lessThan(width),
+      );
+    });
+  }
 }
