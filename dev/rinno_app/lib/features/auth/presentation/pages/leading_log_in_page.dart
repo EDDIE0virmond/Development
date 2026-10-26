@@ -38,7 +38,7 @@ class LeadingLogInPage extends StatelessWidget {
                   'Sistema Descritivo da Plantas Solares',
                   style: GoogleFonts.inter(
                     fontSize: 16,
-                    color: Colors.white.withOpacity(0.9),
+                    color: Colors.white.withValues(alpha: 0.9),
                   ),
                 ),
                 const SizedBox(height: 48),
@@ -89,7 +89,7 @@ class LeadingLogInPage extends StatelessWidget {
                                   fontSize: 12,
                                   color: const Color(
                                     0xFF2E7D32,
-                                  ).withOpacity(0.8),
+                                  ).withValues(alpha: 0.8),
                                 ),
                               ),
                             ),
@@ -138,7 +138,7 @@ class _OpcaoBotao extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: const Color(0xFF2E7D32).withOpacity(0.1),
+                color: const Color(0xFF2E7D32).withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(icon, color: const Color(0xFF2E7D32), size: 28),

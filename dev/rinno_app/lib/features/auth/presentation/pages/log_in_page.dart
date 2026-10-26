@@ -43,8 +43,6 @@ class _LogInPageState extends State<LogInPage> {
     if (!mounted) return;
 
     if (success) {
-      await Future.delayed(const Duration(milliseconds: 100));
-
       final role = authProvider.userRole;
 
       if (role == 'admin') {

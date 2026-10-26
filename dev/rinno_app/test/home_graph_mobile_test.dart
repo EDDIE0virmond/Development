@@ -25,7 +25,8 @@ void main() {
               ).readAsBytes().then((bytes) => ByteData.sublistView(bytes)),
             );
           await loader.load();
-          final icons = FontLoader('MaterialIcons')..addFont(rootBundle.load('fonts/MaterialIcons-Regular.otf'));
+          final icons = FontLoader('MaterialIcons')
+            ..addFont(rootBundle.load('fonts/MaterialIcons-Regular.otf'));
           await icons.load();
         });
       }
@@ -44,9 +45,10 @@ void main() {
       final api = AppApi(
         store: MemoryStore(),
         client: MockClient((request) async {
-          if (request.url.path.endsWith('/login'))
+          if (request.url.path.endsWith('/login')) {
             return jsonResponse(session('test'));
-          if (request.url.path.endsWith('/stages'))
+          }
+          if (request.url.path.endsWith('/stages')) {
             return jsonResponse({
               'items': [
                 for (final step in steps)
@@ -60,8 +62,10 @@ void main() {
                   },
               ],
             });
-          if (request.url.path.endsWith('/monitoring'))
+          }
+          if (request.url.path.endsWith('/monitoring')) {
             return jsonResponse({'items': []});
+          }
           return jsonResponse({
             'items': [
               {
@@ -138,7 +142,10 @@ void main() {
         await tester.runAsync(() async {
           final context = boundary.currentContext!;
           await precacheImage(const AssetImage('assets/solar.png'), context);
-          await precacheImage(const AssetImage('assets/rinnovare-wordmark.webp'), context);
+          await precacheImage(
+            const AssetImage('assets/rinnovare-wordmark.webp'),
+            context,
+          );
         });
         await tester.pumpAndSettle();
         await Scrollable.ensureVisible(

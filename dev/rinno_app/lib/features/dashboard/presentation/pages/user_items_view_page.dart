@@ -1,10 +1,10 @@
 // lib/features/dashboard/presentation/pages/user_items_view_page.dart
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:rinno_app/features/auth/presentation/widgets/gradient_background.dart';
 import '../../../../core/services/user_management_service.dart';
 import '../../../../core/models/user_item.dart';
-import '../../../../core/models/user_item.dart'; // Certifique-se de importar corretamente
+
+// Certifique-se de importar corretamente
 
 class UserItemsViewPage extends StatefulWidget {
   final int userId;

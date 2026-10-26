@@ -59,11 +59,13 @@ class _ComonUserPageState extends State<ComonUserPage> {
 
     try {
       final plants = await _plantService.getPlantsByUser(userId);
+      if (!mounted) return;
       setState(() {
         _plants = plants;
         _isLoading = false;
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _errorMessage = e.toString();
         _isLoading = false;
@@ -84,18 +86,14 @@ class _ComonUserPageState extends State<ComonUserPage> {
       isLoading = false;
     }
 
+    if (!mounted) return;
     showDialog(
       context: context,
       barrierDismissible: true,
       builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         child: Container(
-          constraints: const BoxConstraints(
-            maxWidth: 400,
-            maxHeight: 600,
-          ),
+          constraints: const BoxConstraints(maxWidth: 400, maxHeight: 600),
           padding: const EdgeInsets.all(20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -134,7 +132,10 @@ class _ComonUserPageState extends State<ComonUserPage> {
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: plant.statusColor.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
@@ -151,10 +152,13 @@ class _ComonUserPageState extends State<ComonUserPage> {
                 ],
               ),
               const SizedBox(height: 12),
-              
+
               // Potência
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.orange.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
@@ -175,12 +179,15 @@ class _ComonUserPageState extends State<ComonUserPage> {
                   ],
                 ),
               ),
-              
+
               const SizedBox(height: 12),
-              
+
               // ===== INFORMAÇÕES DAS PLACAS =====
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.blue.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(8),
@@ -214,20 +221,29 @@ class _ComonUserPageState extends State<ComonUserPage> {
                   ],
                 ),
               ),
-              
+
               const SizedBox(height: 8),
-              
+
               // ===== INFORMAÇÕES DO INVERSOR =====
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.orange.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.orange.withValues(alpha: 0.2)),
+                  border: Border.all(
+                    color: Colors.orange.withValues(alpha: 0.2),
+                  ),
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.electric_bolt, size: 16, color: Colors.orange),
+                    const Icon(
+                      Icons.electric_bolt,
+                      size: 16,
+                      color: Colors.orange,
+                    ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Column(
@@ -241,7 +257,9 @@ class _ComonUserPageState extends State<ComonUserPage> {
                             ),
                           ),
                           Text(
-                            plant.tipoInversor == 'micro' ? 'Micro Inversor' : 'Inversor',
+                            plant.tipoInversor == 'micro'
+                                ? 'Micro Inversor'
+                                : 'Inversor',
                             style: TextStyle(
                               fontSize: 11,
                               color: Colors.grey[600],
@@ -253,41 +271,48 @@ class _ComonUserPageState extends State<ComonUserPage> {
                   ],
                 ),
               ),
-              
+
               const SizedBox(height: 16),
               const Divider(),
               const SizedBox(height: 8),
-              
+
               // Conteúdo dos status
               Expanded(
                 child: isLoading
                     ? const Center(child: CircularProgressIndicator())
                     : errorMessage != null
-                        ? Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(Icons.error_outline, size: 40, color: Colors.red),
-                                const SizedBox(height: 8),
-                                Text(
-                                  errorMessage!,
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(fontSize: 13),
-                                ),
-                              ],
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.error_outline,
+                              size: 40,
+                              color: Colors.red,
                             ),
-                          )
-                        : SingleChildScrollView(
-                            child: Column(
-                              children: [
-                                _buildCategoriaSection(statusList, 'projeto'),
-                                const SizedBox(height: 12),
-                                _buildCategoriaSection(statusList, 'instalacao'),
-                                const SizedBox(height: 12),
-                                _buildCategoriaSection(statusList, 'completividade'),
-                              ],
+                            const SizedBox(height: 8),
+                            Text(
+                              errorMessage,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(fontSize: 13),
                             ),
-                          ),
+                          ],
+                        ),
+                      )
+                    : SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            _buildCategoriaSection(statusList, 'projeto'),
+                            const SizedBox(height: 12),
+                            _buildCategoriaSection(statusList, 'instalacao'),
+                            const SizedBox(height: 12),
+                            _buildCategoriaSection(
+                              statusList,
+                              'completividade',
+                            ),
+                          ],
+                        ),
+                      ),
               ),
               const SizedBox(height: 8),
               // Botão fechar
@@ -305,9 +330,7 @@ class _ComonUserPageState extends State<ComonUserPage> {
                   ),
                   child: const Text(
                     'FECHAR',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: TextStyle(fontWeight: FontWeight.w600),
                   ),
                 ),
               ),
@@ -318,7 +341,10 @@ class _ComonUserPageState extends State<ComonUserPage> {
     );
   }
 
-  Widget _buildCategoriaSection(List<PlantStatus> statusList, String categoria) {
+  Widget _buildCategoriaSection(
+    List<PlantStatus> statusList,
+    String categoria,
+  ) {
     final items = statusList.where((s) => s.categoria == categoria).toList();
     if (items.isEmpty) return const SizedBox.shrink();
 
@@ -344,10 +370,7 @@ class _ComonUserPageState extends State<ComonUserPage> {
             const Spacer(),
             Text(
               '${(_getProgressByCategoria(statusList, categoria) * 100).toInt()}%',
-              style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-              ),
+              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
             ),
             const SizedBox(width: 6),
             SizedBox(
@@ -368,7 +391,10 @@ class _ComonUserPageState extends State<ComonUserPage> {
     );
   }
 
-  double _getProgressByCategoria(List<PlantStatus> statusList, String categoria) {
+  double _getProgressByCategoria(
+    List<PlantStatus> statusList,
+    String categoria,
+  ) {
     final items = statusList.where((s) => s.categoria == categoria).toList();
     if (items.isEmpty) return 0.0;
     final completed = items.where((s) => s.isCompleted).length;
@@ -381,8 +407,8 @@ class _ComonUserPageState extends State<ComonUserPage> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
-          color: status.isCompleted 
-              ? Colors.green.withValues(alpha: 0.05) 
+          color: status.isCompleted
+              ? Colors.green.withValues(alpha: 0.05)
               : Colors.orange.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(6),
           border: Border.all(
@@ -392,11 +418,7 @@ class _ComonUserPageState extends State<ComonUserPage> {
         ),
         child: Row(
           children: [
-            Icon(
-              status.statusIcon,
-              color: status.statusColor,
-              size: 16,
-            ),
+            Icon(status.statusIcon, color: status.statusColor, size: 16),
             const SizedBox(width: 8),
             Expanded(
               child: Text(
@@ -404,12 +426,10 @@ class _ComonUserPageState extends State<ComonUserPage> {
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
-                  decoration: status.isCompleted 
-                      ? TextDecoration.lineThrough 
+                  decoration: status.isCompleted
+                      ? TextDecoration.lineThrough
                       : null,
-                  color: status.isCompleted 
-                      ? Colors.green 
-                      : Colors.black87,
+                  color: status.isCompleted ? Colors.green : Colors.black87,
                 ),
               ),
             ),
@@ -463,91 +483,95 @@ class _ComonUserPageState extends State<ComonUserPage> {
           child: _isLoading
               ? const Center(child: CircularProgressIndicator())
               : _errorMessage != null
-                  ? Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(Icons.error_outline, size: 64, color: Colors.red),
-                          const SizedBox(height: 16),
-                          Text(_errorMessage!),
-                          const SizedBox(height: 16),
-                          ElevatedButton(
-                            onPressed: _loadPlants,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF2E7D32),
-                            ),
-                            child: const Text('Tentar novamente'),
-                          ),
-                        ],
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.error_outline,
+                        size: 64,
+                        color: Colors.red,
                       ),
-                    )
-                  : _plants.isEmpty
-                      ? const Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              SolarIcon(size: 64, color: Colors.grey),
-                              SizedBox(height: 16),
-                              Text(
-                                'Nenhuma planta cadastrada',
-                                style: TextStyle(fontSize: 16, color: Colors.grey),
-                              ),
-                              SizedBox(height: 8),
-                              Text(
-                                'Suas plantas aparecerão aqui',
-                                style: TextStyle(fontSize: 14, color: Colors.grey),
-                              ),
-                            ],
-                          ),
-                        )
-                      : RefreshIndicator(
-                          onRefresh: _loadPlants,
-                          child: SingleChildScrollView(
-                            padding: const EdgeInsets.all(16),
-                            physics: const AlwaysScrollableScrollPhysics(),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // Header com boas-vindas
-                                Column(
-                                  children: [
-                                    const LogoWidget(size: 50),
-                                    const SizedBox(height: 12),
-                                    Text(
-                                      'Bem-vindo, ${authProvider.currentUser?.nome ?? "Usuário"}!',
-                                      style: const TextStyle(
-                                        color: Color(0xFF0F172A),
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      'Suas plantas solares',
-                                      style: TextStyle(
-                                        color: Colors.grey[600],
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 24),
-                                
-                                // Lista de plantas em formato retângulo
-                                ListView.builder(
-                                  shrinkWrap: true,
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  itemCount: _plants.length,
-                                  itemBuilder: (context, index) {
-                                    final plant = _plants[index];
-                                    return _buildPlantCard(context, plant);
-                                  },
-                                ),
-                              ],
-                            ),
-                          ),
+                      const SizedBox(height: 16),
+                      Text(_errorMessage!),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: _loadPlants,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF2E7D32),
                         ),
+                        child: const Text('Tentar novamente'),
+                      ),
+                    ],
+                  ),
+                )
+              : _plants.isEmpty
+              ? const Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SolarIcon(size: 64, color: Colors.grey),
+                      SizedBox(height: 16),
+                      Text(
+                        'Nenhuma planta cadastrada',
+                        style: TextStyle(fontSize: 16, color: Colors.grey),
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        'Suas plantas aparecerão aqui',
+                        style: TextStyle(fontSize: 14, color: Colors.grey),
+                      ),
+                    ],
+                  ),
+                )
+              : RefreshIndicator(
+                  onRefresh: _loadPlants,
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(16),
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Header com boas-vindas
+                        Column(
+                          children: [
+                            const LogoWidget(size: 50),
+                            const SizedBox(height: 12),
+                            Text(
+                              'Bem-vindo, ${authProvider.currentUser?.nome ?? "Usuário"}!',
+                              style: const TextStyle(
+                                color: Color(0xFF0F172A),
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'Suas plantas solares',
+                              style: TextStyle(
+                                color: Colors.grey[600],
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 24),
+
+                        // Lista de plantas em formato retângulo
+                        ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: _plants.length,
+                          itemBuilder: (context, index) {
+                            final plant = _plants[index];
+                            return _buildPlantCard(context, plant);
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
         ),
       ),
     );
@@ -630,7 +654,10 @@ class _ComonUserPageState extends State<ComonUserPage> {
                       Navigator.pop(context);
                       await authProvider.logout();
                       if (context.mounted) {
-                        Navigator.pushReplacementNamed(context, AppRoutes.leadingLogIn);
+                        Navigator.pushReplacementNamed(
+                          context,
+                          AppRoutes.leadingLogIn,
+                        );
                       }
                     },
                     iconColor: Colors.red,
@@ -680,9 +707,7 @@ class _ComonUserPageState extends State<ComonUserPage> {
     return Card(
       elevation: 2,
       margin: const EdgeInsets.only(bottom: 12),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
         onTap: () => _showPlantDetailDialog(plant),
         borderRadius: BorderRadius.circular(12),
@@ -725,7 +750,10 @@ class _ComonUserPageState extends State<ComonUserPage> {
                           ),
                         ),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 2,
+                          ),
                           decoration: BoxDecoration(
                             color: plant.statusColor.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(10),
@@ -744,10 +772,7 @@ class _ComonUserPageState extends State<ComonUserPage> {
                     const SizedBox(height: 2),
                     Text(
                       plant.localizacao,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey[600],
-                      ),
+                      style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -760,7 +785,11 @@ class _ComonUserPageState extends State<ComonUserPage> {
                         Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Icon(Icons.flash_on, size: 12, color: Colors.orange),
+                            const Icon(
+                              Icons.flash_on,
+                              size: 12,
+                              color: Colors.orange,
+                            ),
                             const SizedBox(width: 2),
                             Text(
                               '${plant.potencia.toStringAsFixed(1)} kWp',
@@ -775,7 +804,11 @@ class _ComonUserPageState extends State<ComonUserPage> {
                         Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Icon(Icons.solar_power, size: 12, color: Colors.blue),
+                            const Icon(
+                              Icons.solar_power,
+                              size: 12,
+                              color: Colors.blue,
+                            ),
                             const SizedBox(width: 2),
                             Flexible(
                               child: Text(
@@ -793,7 +826,11 @@ class _ComonUserPageState extends State<ComonUserPage> {
                     // Linha com Inversores
                     Row(
                       children: [
-                        const Icon(Icons.electric_bolt, size: 12, color: Colors.orange),
+                        const Icon(
+                          Icons.electric_bolt,
+                          size: 12,
+                          color: Colors.orange,
+                        ),
                         const SizedBox(width: 2),
                         Flexible(
                           child: Text(
@@ -811,11 +848,7 @@ class _ComonUserPageState extends State<ComonUserPage> {
               ),
               const SizedBox(width: 4),
               // Seta indicadora
-              const Icon(
-                Icons.chevron_right,
-                color: Colors.grey,
-                size: 20,
-              ),
+              const Icon(Icons.chevron_right, color: Colors.grey, size: 20),
             ],
           ),
         ),
@@ -823,9 +856,6 @@ class _ComonUserPageState extends State<ComonUserPage> {
     );
   }
 
-  String _formatDate(DateTime date) {
-    return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
-  }
 
   void _showSearchDialog(BuildContext context) {
     showDialog(
@@ -842,9 +872,7 @@ class _ComonUserPageState extends State<ComonUserPage> {
             Navigator.pop(context);
           },
         ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -865,8 +893,8 @@ class _ComonUserPageState extends State<ComonUserPage> {
   }
 
   void _showInfo(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 }

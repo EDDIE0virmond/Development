@@ -57,11 +57,13 @@ class _AdminPlantListPageState extends State<AdminPlantListPage> {
 
     try {
       final plants = await _plantService.getAllPlants();
+      if (!mounted) return;
       setState(() {
         _plants = plants;
         _isLoading = false;
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _errorMessage = e.toString();
         _isLoading = false;
@@ -70,10 +72,10 @@ class _AdminPlantListPageState extends State<AdminPlantListPage> {
   }
 
   Future<void> _addPlant(
-    int userId, 
-    String nome, 
-    String descricao, 
-    double potencia, 
+    int userId,
+    String nome,
+    String descricao,
+    double potencia,
     String localizacao,
     int quantidadePlacas,
     String nomePlaca,
@@ -82,10 +84,10 @@ class _AdminPlantListPageState extends State<AdminPlantListPage> {
     int quantidadeInversores,
   ) async {
     final success = await _plantService.createPlant(
-      userId, 
-      nome, 
-      descricao, 
-      potencia, 
+      userId,
+      nome,
+      descricao,
+      potencia,
       localizacao,
       quantidadePlacas,
       nomePlaca,
@@ -93,10 +95,11 @@ class _AdminPlantListPageState extends State<AdminPlantListPage> {
       nomeInversor,
       quantidadeInversores,
     );
-    
+
     if (mounted) {
       if (success) {
         await _loadAllPlants();
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('🌱 Planta criada com sucesso!'),
@@ -114,18 +117,27 @@ class _AdminPlantListPageState extends State<AdminPlantListPage> {
     }
   }
 
-  Future<void> _updateStatus(PlantStatus status, bool isCompleted, String? observacao) async {
-    final success = await _statusService.updatePlantStatus(status.id, isCompleted, observacao: observacao);
-    
+  Future<void> _updateStatus(
+    PlantStatus status,
+    bool isCompleted,
+    String? observacao,
+  ) async {
+    final success = await _statusService.updatePlantStatus(
+      status.id,
+      isCompleted,
+      observacao: observacao,
+    );
+
     if (mounted) {
       if (success) {
         await _loadAllPlants();
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              isCompleted 
-                ? '✅ ${status.nome} concluído!' 
-                : '↩️ ${status.nome} reaberto',
+              isCompleted
+                  ? '✅ ${status.nome} concluído!'
+                  : '↩️ ${status.nome} reaberto',
             ),
             backgroundColor: isCompleted ? Colors.green : Colors.orange,
           ),
@@ -154,18 +166,14 @@ class _AdminPlantListPageState extends State<AdminPlantListPage> {
       isLoading = false;
     }
 
+    if (!mounted) return;
     showDialog(
       context: context,
       barrierDismissible: true,
       builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         child: Container(
-          constraints: const BoxConstraints(
-            maxWidth: 400,
-            maxHeight: 600,
-          ),
+          constraints: const BoxConstraints(maxWidth: 400, maxHeight: 600),
           padding: const EdgeInsets.all(20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -204,7 +212,10 @@ class _AdminPlantListPageState extends State<AdminPlantListPage> {
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: plant.statusColor.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
@@ -221,10 +232,13 @@ class _AdminPlantListPageState extends State<AdminPlantListPage> {
                 ],
               ),
               const SizedBox(height: 12),
-              
+
               // Potência
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.orange.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
@@ -245,12 +259,15 @@ class _AdminPlantListPageState extends State<AdminPlantListPage> {
                   ],
                 ),
               ),
-              
+
               const SizedBox(height: 12),
-              
+
               // Informações das placas
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.blue.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(8),
@@ -284,20 +301,29 @@ class _AdminPlantListPageState extends State<AdminPlantListPage> {
                   ],
                 ),
               ),
-              
+
               const SizedBox(height: 8),
-              
+
               // Informações do inversor
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.orange.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.orange.withValues(alpha: 0.2)),
+                  border: Border.all(
+                    color: Colors.orange.withValues(alpha: 0.2),
+                  ),
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.electric_bolt, size: 16, color: Colors.orange),
+                    const Icon(
+                      Icons.electric_bolt,
+                      size: 16,
+                      color: Colors.orange,
+                    ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Column(
@@ -311,7 +337,9 @@ class _AdminPlantListPageState extends State<AdminPlantListPage> {
                             ),
                           ),
                           Text(
-                            plant.tipoInversor == 'micro' ? 'Micro Inversor' : 'Inversor',
+                            plant.tipoInversor == 'micro'
+                                ? 'Micro Inversor'
+                                : 'Inversor',
                             style: TextStyle(
                               fontSize: 11,
                               color: Colors.grey[600],
@@ -323,41 +351,57 @@ class _AdminPlantListPageState extends State<AdminPlantListPage> {
                   ],
                 ),
               ),
-              
+
               const SizedBox(height: 16),
               const Divider(),
               const SizedBox(height: 8),
-              
+
               // Conteúdo dos status
               Expanded(
                 child: isLoading
                     ? const Center(child: CircularProgressIndicator())
                     : errorMessage != null
-                        ? Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(Icons.error_outline, size: 40, color: Colors.red),
-                                const SizedBox(height: 8),
-                                Text(
-                                  errorMessage!,
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(fontSize: 13),
-                                ),
-                              ],
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.error_outline,
+                              size: 40,
+                              color: Colors.red,
                             ),
-                          )
-                        : SingleChildScrollView(
-                            child: Column(
-                              children: [
-                                _buildCategoriaSection(statusList, 'projeto', plant.id),
-                                const SizedBox(height: 12),
-                                _buildCategoriaSection(statusList, 'instalacao', plant.id),
-                                const SizedBox(height: 12),
-                                _buildCategoriaSection(statusList, 'completividade', plant.id),
-                              ],
+                            const SizedBox(height: 8),
+                            Text(
+                              errorMessage,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(fontSize: 13),
                             ),
-                          ),
+                          ],
+                        ),
+                      )
+                    : SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            _buildCategoriaSection(
+                              statusList,
+                              'projeto',
+                              plant.id,
+                            ),
+                            const SizedBox(height: 12),
+                            _buildCategoriaSection(
+                              statusList,
+                              'instalacao',
+                              plant.id,
+                            ),
+                            const SizedBox(height: 12),
+                            _buildCategoriaSection(
+                              statusList,
+                              'completividade',
+                              plant.id,
+                            ),
+                          ],
+                        ),
+                      ),
               ),
               const SizedBox(height: 8),
               // Botão fechar
@@ -375,9 +419,7 @@ class _AdminPlantListPageState extends State<AdminPlantListPage> {
                   ),
                   child: const Text(
                     'FECHAR',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: TextStyle(fontWeight: FontWeight.w600),
                   ),
                 ),
               ),
@@ -388,7 +430,11 @@ class _AdminPlantListPageState extends State<AdminPlantListPage> {
     );
   }
 
-  Widget _buildCategoriaSection(List<PlantStatus> statusList, String categoria, int plantId) {
+  Widget _buildCategoriaSection(
+    List<PlantStatus> statusList,
+    String categoria,
+    int plantId,
+  ) {
     final items = statusList.where((s) => s.categoria == categoria).toList();
     if (items.isEmpty) return const SizedBox.shrink();
 
@@ -414,10 +460,7 @@ class _AdminPlantListPageState extends State<AdminPlantListPage> {
             const Spacer(),
             Text(
               '${(_getProgressByCategoria(statusList, categoria) * 100).toInt()}%',
-              style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-              ),
+              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
             ),
             const SizedBox(width: 6),
             SizedBox(
@@ -438,7 +481,10 @@ class _AdminPlantListPageState extends State<AdminPlantListPage> {
     );
   }
 
-  double _getProgressByCategoria(List<PlantStatus> statusList, String categoria) {
+  double _getProgressByCategoria(
+    List<PlantStatus> statusList,
+    String categoria,
+  ) {
     final items = statusList.where((s) => s.categoria == categoria).toList();
     if (items.isEmpty) return 0.0;
     final completed = items.where((s) => s.isCompleted).length;
@@ -464,8 +510,8 @@ class _AdminPlantListPageState extends State<AdminPlantListPage> {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
           decoration: BoxDecoration(
-            color: status.isCompleted 
-                ? Colors.green.withValues(alpha: 0.05) 
+            color: status.isCompleted
+                ? Colors.green.withValues(alpha: 0.05)
                 : Colors.orange.withValues(alpha: 0.05),
             borderRadius: BorderRadius.circular(6),
             border: Border.all(
@@ -475,11 +521,7 @@ class _AdminPlantListPageState extends State<AdminPlantListPage> {
           ),
           child: Row(
             children: [
-              Icon(
-                status.statusIcon,
-                color: status.statusColor,
-                size: 16,
-              ),
+              Icon(status.statusIcon, color: status.statusColor, size: 16),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
@@ -487,12 +529,10 @@ class _AdminPlantListPageState extends State<AdminPlantListPage> {
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
-                    decoration: status.isCompleted 
-                        ? TextDecoration.lineThrough 
+                    decoration: status.isCompleted
+                        ? TextDecoration.lineThrough
                         : null,
-                    color: status.isCompleted 
-                        ? Colors.green 
-                        : Colors.black87,
+                    color: status.isCompleted ? Colors.green : Colors.black87,
                   ),
                 ),
               ),
@@ -512,11 +552,7 @@ class _AdminPlantListPageState extends State<AdminPlantListPage> {
                 ),
               ),
               const SizedBox(width: 4),
-              const Icon(
-                Icons.edit,
-                size: 14,
-                color: Colors.grey,
-              ),
+              const Icon(Icons.edit, size: 14, color: Colors.grey),
             ],
           ),
         ),
@@ -532,7 +568,9 @@ class _AdminPlantListPageState extends State<AdminPlantListPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Gerenciar Plantas'),
-        backgroundColor: isAdmin ? const Color(0xFF7B1FA2) : const Color(0xFF44842A),
+        backgroundColor: isAdmin
+            ? const Color(0xFF7B1FA2)
+            : const Color(0xFF44842A),
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
@@ -556,199 +594,223 @@ class _AdminPlantListPageState extends State<AdminPlantListPage> {
           child: _isLoading
               ? const Center(child: CircularProgressIndicator())
               : _errorMessage != null
-                  ? Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(Icons.error_outline, size: 64, color: Colors.red),
-                          const SizedBox(height: 16),
-                          Text(_errorMessage!),
-                          const SizedBox(height: 16),
-                          ElevatedButton(
-                            onPressed: _loadAllPlants,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF2E7D32),
-                            ),
-                            child: const Text('Tentar novamente'),
-                          ),
-                        ],
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.error_outline,
+                        size: 64,
+                        color: Colors.red,
                       ),
-                    )
-                  : _plants.isEmpty
-                      ? const Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              SolarIcon(size: 64, color: Colors.grey),
-                              SizedBox(height: 16),
-                              Text(
-                                'Nenhuma planta cadastrada',
-                                style: TextStyle(fontSize: 16, color: Colors.grey),
-                              ),
-                              SizedBox(height: 8),
-                              Text(
-                                'Toque no + para adicionar uma planta',
-                                style: TextStyle(fontSize: 14, color: Colors.grey),
-                              ),
-                            ],
-                          ),
-                        )
-                      : RefreshIndicator(
-                          onRefresh: _loadAllPlants,
-                          child: ListView.builder(
-                            padding: const EdgeInsets.all(16),
-                            itemCount: _plants.length,
-                            itemBuilder: (context, index) {
-                              final plant = _plants[index];
-                              return Card(
-                                elevation: 2,
-                                margin: const EdgeInsets.only(bottom: 12),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
+                      const SizedBox(height: 16),
+                      Text(_errorMessage!),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: _loadAllPlants,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF2E7D32),
+                        ),
+                        child: const Text('Tentar novamente'),
+                      ),
+                    ],
+                  ),
+                )
+              : _plants.isEmpty
+              ? const Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SolarIcon(size: 64, color: Colors.grey),
+                      SizedBox(height: 16),
+                      Text(
+                        'Nenhuma planta cadastrada',
+                        style: TextStyle(fontSize: 16, color: Colors.grey),
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        'Toque no + para adicionar uma planta',
+                        style: TextStyle(fontSize: 14, color: Colors.grey),
+                      ),
+                    ],
+                  ),
+                )
+              : RefreshIndicator(
+                  onRefresh: _loadAllPlants,
+                  child: ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: _plants.length,
+                    itemBuilder: (context, index) {
+                      final plant = _plants[index];
+                      return Card(
+                        elevation: 2,
+                        margin: const EdgeInsets.only(bottom: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: InkWell(
+                          onTap: () => _showPlantDetailDialog(plant),
+                          borderRadius: BorderRadius.circular(12),
+                          child: Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              color: Colors.white,
+                            ),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 50,
+                                  height: 50,
+                                  decoration: BoxDecoration(
+                                    color: const Color(
+                                      0xFF2E7D32,
+                                    ).withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: const SolarIcon(
+                                    size: 28,
+                                    color: Color(0xFF2E7D32),
+                                  ),
                                 ),
-                                child: InkWell(
-                                  onTap: () => _showPlantDetailDialog(plant),
-                                  borderRadius: BorderRadius.circular(12),
-                                  child: Container(
-                                    padding: const EdgeInsets.all(12),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(12),
-                                      color: Colors.white,
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        Container(
-                                          width: 50,
-                                          height: 50,
-                                          decoration: BoxDecoration(
-                                            color: const Color(0xFF2E7D32).withValues(alpha: 0.1),
-                                            borderRadius: BorderRadius.circular(12),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              plant.nome,
+                                              style: const TextStyle(
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.bold,
+                                                color: Color(0xFF0F172A),
+                                              ),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
                                           ),
-                                          child: const SolarIcon(size: 28, color: Color(0xFF2E7D32)),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 8,
+                                              vertical: 2,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: plant.statusColor
+                                                  .withValues(alpha: 0.1),
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                            ),
+                                            child: Text(
+                                              plant.statusLabel,
+                                              style: TextStyle(
+                                                fontSize: 9,
+                                                fontWeight: FontWeight.w600,
+                                                color: plant.statusColor,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        'Usuário ID: ${plant.userId} - ${plant.localizacao}',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.grey[600],
                                         ),
-                                        const SizedBox(width: 12),
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      const SizedBox(height: 4),
+                                      // Linha com Potência + Placas
+                                      Wrap(
+                                        spacing: 12,
+                                        runSpacing: 2,
+                                        children: [
+                                          Row(
+                                            mainAxisSize: MainAxisSize.min,
                                             children: [
-                                              Row(
-                                                children: [
-                                                  Expanded(
-                                                    child: Text(
-                                                      plant.nome,
-                                                      style: const TextStyle(
-                                                        fontSize: 15,
-                                                        fontWeight: FontWeight.bold,
-                                                        color: Color(0xFF0F172A),
-                                                      ),
-                                                      maxLines: 1,
-                                                      overflow: TextOverflow.ellipsis,
-                                                    ),
-                                                  ),
-                                                  Container(
-                                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                                    decoration: BoxDecoration(
-                                                      color: plant.statusColor.withValues(alpha: 0.1),
-                                                      borderRadius: BorderRadius.circular(10),
-                                                    ),
-                                                    child: Text(
-                                                      plant.statusLabel,
-                                                      style: TextStyle(
-                                                        fontSize: 9,
-                                                        fontWeight: FontWeight.w600,
-                                                        color: plant.statusColor,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
+                                              const Icon(
+                                                Icons.flash_on,
+                                                size: 12,
+                                                color: Colors.orange,
                                               ),
-                                              const SizedBox(height: 2),
+                                              const SizedBox(width: 2),
                                               Text(
-                                                'Usuário ID: ${plant.userId} - ${plant.localizacao}',
-                                                style: TextStyle(
-                                                  fontSize: 12,
-                                                  color: Colors.grey[600],
+                                                '${plant.potencia.toStringAsFixed(1)} kWp',
+                                                style: const TextStyle(
+                                                  fontSize: 11,
+                                                  fontWeight: FontWeight.w500,
+                                                  color: Colors.orange,
                                                 ),
-                                                maxLines: 1,
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                              const SizedBox(height: 4),
-                                              // Linha com Potência + Placas
-                                              Wrap(
-                                                spacing: 12,
-                                                runSpacing: 2,
-                                                children: [
-                                                  Row(
-                                                    mainAxisSize: MainAxisSize.min,
-                                                    children: [
-                                                      const Icon(Icons.flash_on, size: 12, color: Colors.orange),
-                                                      const SizedBox(width: 2),
-                                                      Text(
-                                                        '${plant.potencia.toStringAsFixed(1)} kWp',
-                                                        style: const TextStyle(
-                                                          fontSize: 11,
-                                                          fontWeight: FontWeight.w500,
-                                                          color: Colors.orange,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  Row(
-                                                    mainAxisSize: MainAxisSize.min,
-                                                    children: [
-                                                      const Icon(Icons.solar_power, size: 12, color: Colors.blue),
-                                                      const SizedBox(width: 2),
-                                                      Flexible(
-                                                        child: Text(
-                                                          '${plant.quantidadePlacas}x ${plant.nomePlaca}',
-                                                          style: TextStyle(
-                                                            fontSize: 11,
-                                                            color: Colors.blue[700],
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ],
-                                              ),
-                                              // Linha com Inversores
-                                              Row(
-                                                children: [
-                                                  const Icon(Icons.electric_bolt, size: 12, color: Colors.orange),
-                                                  const SizedBox(width: 2),
-                                                  Flexible(
-                                                    child: Text(
-                                                      '${plant.quantidadeInversores}x ${plant.nomeInversor} (${plant.tipoInversor == 'micro' ? 'Micro' : 'Inv.'})',
-                                                      style: TextStyle(
-                                                        fontSize: 11,
-                                                        color: Colors.orange[700],
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
                                               ),
                                             ],
                                           ),
-                                        ),
-                                        const Icon(
-                                          Icons.chevron_right,
-                                          color: Colors.grey,
-                                          size: 20,
-                                        ),
-                                      ],
-                                    ),
+                                          Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              const Icon(
+                                                Icons.solar_power,
+                                                size: 12,
+                                                color: Colors.blue,
+                                              ),
+                                              const SizedBox(width: 2),
+                                              Flexible(
+                                                child: Text(
+                                                  '${plant.quantidadePlacas}x ${plant.nomePlaca}',
+                                                  style: TextStyle(
+                                                    fontSize: 11,
+                                                    color: Colors.blue[700],
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                      // Linha com Inversores
+                                      Row(
+                                        children: [
+                                          const Icon(
+                                            Icons.electric_bolt,
+                                            size: 12,
+                                            color: Colors.orange,
+                                          ),
+                                          const SizedBox(width: 2),
+                                          Flexible(
+                                            child: Text(
+                                              '${plant.quantidadeInversores}x ${plant.nomeInversor} (${plant.tipoInversor == 'micro' ? 'Micro' : 'Inv.'})',
+                                              style: TextStyle(
+                                                fontSize: 11,
+                                                color: Colors.orange[700],
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              );
-                            },
+                                const Icon(
+                                  Icons.chevron_right,
+                                  color: Colors.grey,
+                                  size: 20,
+                                ),
+                              ],
+                            ),
                           ),
                         ),
+                      );
+                    },
+                  ),
+                ),
         ),
       ),
     );
   }
 
-  String _formatDate(DateTime date) {
-    return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
-  }
 }

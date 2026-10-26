@@ -44,11 +44,12 @@ class _MonitoringHistoryState extends State<MonitoringHistory> {
       firstDate: today.subtract(const Duration(days: 365)),
       lastDate: today,
     );
-    if (picked != null && mounted)
+    if (picked != null && mounted) {
       setState(() {
         day = picked;
         metric = null;
       });
+    }
   }
 
   @override
@@ -95,23 +96,25 @@ class _MonitoringHistoryState extends State<MonitoringHistory> {
             );
           }),
           onChanged: (v) {
-            if (v != null)
+            if (v != null) {
               setState(() {
                 month = v;
                 metric = null;
               });
+            }
           },
         ),
       SizedBox(height: MediaQuery.sizeOf(context).width < 600 ? 4 : 16),
       FutureBuilder<Map<String, dynamic>>(
         future: load(),
         builder: (context, snapshot) {
-          if (snapshot.connectionState != ConnectionState.done)
+          if (snapshot.connectionState != ConnectionState.done) {
             return const Padding(
               padding: EdgeInsets.all(24),
               child: Center(child: CircularProgressIndicator()),
             );
-          if (snapshot.hasError)
+          }
+          if (snapshot.hasError) {
             return Column(
               children: [
                 const Text('Não foi possível consultar este período.'),
@@ -121,6 +124,7 @@ class _MonitoringHistoryState extends State<MonitoringHistory> {
                 ),
               ],
             );
+          }
           final data = snapshot.data!;
           final series = (data['series'] as List? ?? [])
               .whereType<Map>()

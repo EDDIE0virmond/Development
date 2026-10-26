@@ -15,11 +15,16 @@ class _AddItemDialogState extends State<AddItemDialog> {
   final _formKey = GlobalKey<FormState>();
   final _nomeController = TextEditingController();
   final _descricaoController = TextEditingController();
-  String _selectedTipo = 'microinversor'; // CORRIGIDO: mudado de 'produto' para 'microinversor'
+  String _selectedTipo =
+      'microinversor'; // CORRIGIDO: mudado de 'produto' para 'microinversor'
   bool _isLoading = false;
 
   final List<Map<String, dynamic>> _tipos = [
-    {'value': 'microinversor', 'label': 'Micro-Inversor', 'icon': Icons.inventory},
+    {
+      'value': 'microinversor',
+      'label': 'Micro-Inversor',
+      'icon': Icons.inventory,
+    },
     {'value': 'inversor', 'label': 'Inversor', 'icon': Icons.build},
     {'value': 'placas', 'label': 'Placas', 'icon': Icons.description},
   ];
@@ -91,7 +96,7 @@ class _AddItemDialogState extends State<AddItemDialog> {
               ),
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
-                value: _selectedTipo,
+                initialValue: _selectedTipo,
                 decoration: const InputDecoration(
                   labelText: 'Tipo',
                   border: OutlineInputBorder(),

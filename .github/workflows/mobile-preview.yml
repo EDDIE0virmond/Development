@@ -1,0 +1,53 @@
+name: Android and iOS preview
+on:
+  push:
+    branches: [codex/app-rinnovare]
+    paths: ['dev/rinno_app/**', '.github/workflows/mobile-preview.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: mobile-preview-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  mobile:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {os: ubuntu-latest, target: android}
+          - {os: macos-latest, target: ios}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    defaults:
+      run:
+        working-directory: dev/rinno_app
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-java@v5
+        if: matrix.target == 'android'
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: '3.47.6'
+          cache: true
+      - run: flutter pub get
+      - run: dart analyze lib test
+      - run: flutter test
+      - name: Android emulator APK
+        if: matrix.target == 'android'
+        run: flutter build apk --debug
+      - name: iOS simulator and unsigned device validation
+        if: matrix.target == 'ios'
+        run: |
+          flutter build ios --simulator --debug
+          tar -czf build/rinnovare-ios-simulator.tar.gz -C build/ios/iphonesimulator Runner.app
+          flutter build ios --release --no-codesign
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rinnovare-${{ matrix.target }}-preview
+          path: dev/rinno_app/${{ matrix.target == 'android' && 'build/app/outputs/flutter-apk/app-debug.apk' || 'build/rinnovare-ios-simulator.tar.gz' }}
+          if-no-files-found: error

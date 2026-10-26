@@ -19,7 +19,7 @@ class UpdateStatusDialog extends StatefulWidget {
 
 class _UpdateStatusDialogState extends State<UpdateStatusDialog> {
   final _observacaoController = TextEditingController();
-  bool _isLoading = false;
+  final bool _isLoading = false;
 
   @override
   void dispose() {
@@ -43,10 +43,7 @@ class _UpdateStatusDialogState extends State<UpdateStatusDialog> {
             const SizedBox(height: 8),
             Text(
               widget.status.nome,
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey[600],
-              ),
+              style: TextStyle(fontSize: 16, color: Colors.grey[600]),
             ),
             const SizedBox(height: 24),
             TextFormField(
@@ -74,8 +71,8 @@ class _UpdateStatusDialogState extends State<UpdateStatusDialog> {
                     onPressed: () {
                       widget.onUpdate(
                         !widget.status.isCompleted,
-                        _observacaoController.text.isEmpty 
-                            ? null 
+                        _observacaoController.text.isEmpty
+                            ? null
                             : _observacaoController.text,
                       );
                       Navigator.pop(context);

@@ -20,8 +20,9 @@ class _ClientMonitoringState extends State<ClientMonitoring> {
   ) => FutureBuilder<List<Map<String, dynamic>>>(
     future: items,
     builder: (context, snapshot) {
-      if (snapshot.connectionState != ConnectionState.done)
+      if (snapshot.connectionState != ConnectionState.done) {
         return const Center(child: CircularProgressIndicator());
+      }
       if (snapshot.hasError) {
         return Center(
           child: GlassSurface(

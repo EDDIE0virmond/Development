@@ -51,8 +51,9 @@ void main() {
         if (r.url.path.endsWith('/login')) {
           return jsonResponse(session('token'));
         }
-        if (r.url.path.endsWith('/monitoring'))
+        if (r.url.path.endsWith('/monitoring')) {
           return jsonResponse({'items': []});
+        }
         if (r.url.path.endsWith('/stages')) {
           return jsonResponse({
             'items': [

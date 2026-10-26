@@ -1,6 +1,5 @@
 // lib/core/theme/widgets/solar_icon_simple.dart
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class SolarIconSimple extends StatelessWidget {
   final double size;
@@ -17,11 +16,7 @@ class SolarIconSimple extends StatelessWidget {
     return SizedBox(
       width: size,
       height: size,
-      child: Icon(
-        Icons.solar_power,
-        size: size,
-        color: color,
-      ),
+      child: Icon(Icons.solar_power, size: size, color: color),
     );
   }
 }

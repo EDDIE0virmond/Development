@@ -1,6 +1,7 @@
 import 'card_detail_page.dart';
 import 'completed_stages_timeline.dart';
 import 'client_monitoring.dart';
+import 'privacy_page.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../core/models/installation.dart';
@@ -51,6 +52,11 @@ class _ClientHomePageState extends State<ClientHomePage> {
                 alignment: Alignment.centerLeft,
                 child: SizedBox(height: 48, child: BrandMark(compact: true)),
               ),
+            ),
+            IconButton(
+              tooltip: 'Privacidade e dados',
+              onPressed: () => openPrivacy(context),
+              icon: const Icon(Icons.privacy_tip_outlined),
             ),
             IconButton(
               tooltip: 'Sair',
@@ -300,16 +306,18 @@ class _ProjectProgressState extends State<_ProjectProgress> {
   Widget build(BuildContext context) => FutureBuilder<List<InstallationStage>>(
     future: data,
     builder: (context, snapshot) {
-      if (snapshot.connectionState != ConnectionState.done)
+      if (snapshot.connectionState != ConnectionState.done) {
         return const Padding(
           padding: EdgeInsets.all(24),
           child: Center(child: CircularProgressIndicator()),
         );
-      if (snapshot.hasError)
+      }
+      if (snapshot.hasError) {
         return _Error(
           error: snapshot.error!,
           retry: () => setState(() => data = widget.api.stages(widget.id)),
         );
+      }
       return CompletedStagesTimeline(stages: snapshot.data ?? []);
     },
   );

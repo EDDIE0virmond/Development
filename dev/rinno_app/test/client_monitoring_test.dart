@@ -18,8 +18,9 @@ void main() {
       final api = AppApi(
         store: MemoryStore(),
         client: MockClient((request) async {
-          if (request.url.path.endsWith('/login'))
+          if (request.url.path.endsWith('/login')) {
             return jsonResponse(session('token'));
+          }
           if (request.url.path.endsWith('/insights')) {
             return jsonResponse({
               'series': [

@@ -42,7 +42,8 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
 
   Future<void> _verifyToken() async {
     final response = await _passwordService.verifyResetToken(widget.token);
-    
+    if (!mounted) return;
+
     setState(() {
       _checkingToken = false;
       _isTokenValid = response['valid'] ?? false;
@@ -69,6 +70,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
       widget.token,
       _passwordController.text,
     );
+    if (!mounted) return;
 
     setState(() {
       _isLoading = false;
@@ -109,15 +111,15 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                 const SizedBox(height: 20),
                 const LogoWidget(size: 80),
                 const SizedBox(height: 32),
-                
+
                 AuthCard(
                   child: _checkingToken
                       ? _buildLoading()
                       : !_isTokenValid
-                          ? _buildInvalidToken()
-                          : _resetSuccess
-                              ? _buildSuccessMessage()
-                              : _buildForm(),
+                      ? _buildInvalidToken()
+                      : _resetSuccess
+                      ? _buildSuccessMessage()
+                      : _buildForm(),
                 ),
               ],
             ),
@@ -142,11 +144,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
   Widget _buildInvalidToken() {
     return Column(
       children: [
-        const Icon(
-          Icons.error_outline,
-          size: 80,
-          color: Colors.red,
-        ),
+        const Icon(Icons.error_outline, size: 80, color: Colors.red),
         const SizedBox(height: 24),
         Text(
           'Link Inválido',
@@ -155,16 +153,13 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
             fontWeight: FontWeight.bold,
             color: const Color(0xFF0F172A),
           ),
-          textAlign: TextAlign.center,  // ✅ CORRETO - fora do style
+          textAlign: TextAlign.center, // ✅ CORRETO - fora do style
         ),
         const SizedBox(height: 16),
         Text(
           'Este link de recuperação é inválido ou já expirou.\nSolicite um novo link.',
-          style: GoogleFonts.inter(
-            fontSize: 14,
-            color: Colors.grey[600],
-          ),
-          textAlign: TextAlign.center,  // ✅ CORRETO - fora do style
+          style: GoogleFonts.inter(fontSize: 14, color: Colors.grey[600]),
+          textAlign: TextAlign.center, // ✅ CORRETO - fora do style
         ),
         const SizedBox(height: 32),
         GreenButton(
@@ -193,13 +188,10 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
           const SizedBox(height: 8),
           Text(
             'Digite sua nova senha',
-            style: GoogleFonts.inter(
-              fontSize: 14,
-              color: Colors.grey[600],
-            ),
+            style: GoogleFonts.inter(fontSize: 14, color: Colors.grey[600]),
           ),
           const SizedBox(height: 32),
-          
+
           CustomInputField(
             controller: _passwordController,
             label: 'Nova senha',
@@ -216,9 +208,9 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
               return null;
             },
           ),
-          
+
           const SizedBox(height: 20),
-          
+
           CustomInputField(
             controller: _confirmPasswordController,
             label: 'Confirmar senha',
@@ -234,9 +226,9 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
               return null;
             },
           ),
-          
+
           const SizedBox(height: 32),
-          
+
           GreenButton(
             text: 'ALTERAR SENHA',
             onPressed: _handleResetPassword,
@@ -264,21 +256,22 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
             fontWeight: FontWeight.bold,
             color: const Color(0xFF0F172A),
           ),
-          textAlign: TextAlign.center,  // ✅ CORRETO - fora do style
+          textAlign: TextAlign.center, // ✅ CORRETO - fora do style
         ),
         const SizedBox(height: 16),
         Text(
           'Sua senha foi alterada com sucesso.\nAgora você pode fazer login com sua nova senha.',
-          style: GoogleFonts.inter(
-            fontSize: 14,
-            color: Colors.grey[600],
-          ),
-          textAlign: TextAlign.center,  // ✅ CORRETO - fora do style
+          style: GoogleFonts.inter(fontSize: 14, color: Colors.grey[600]),
+          textAlign: TextAlign.center, // ✅ CORRETO - fora do style
         ),
         const SizedBox(height: 32),
         GreenButton(
           text: 'FAZER LOGIN',
-          onPressed: () => Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false),
+          onPressed: () => Navigator.pushNamedAndRemoveUntil(
+            context,
+            '/login',
+            (route) => false,
+          ),
           icon: Icons.login,
         ),
       ],

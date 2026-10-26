@@ -36,8 +36,11 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     });
 
     // Primeiro verifica se o e-mail existe
-    final checkEmail = await _passwordService.checkEmail(_emailController.text.trim());
-    
+    final checkEmail = await _passwordService.checkEmail(
+      _emailController.text.trim(),
+    );
+    if (!mounted) return;
+
     if (!checkEmail.exists) {
       setState(() {
         _isLoading = false;
@@ -52,7 +55,10 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     }
 
     // Solicita recuperação
-    final response = await _passwordService.forgotPassword(_emailController.text.trim());
+    final response = await _passwordService.forgotPassword(
+      _emailController.text.trim(),
+    );
+    if (!mounted) return;
 
     setState(() {
       _isLoading = false;
@@ -93,11 +99,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                 const SizedBox(height: 20),
                 const LogoWidget(size: 80),
                 const SizedBox(height: 32),
-                
+
                 AuthCard(
-                  child: _emailSent
-                      ? _buildSuccessMessage()
-                      : _buildForm(),
+                  child: _emailSent ? _buildSuccessMessage() : _buildForm(),
                 ),
               ],
             ),
@@ -124,13 +128,10 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           const SizedBox(height: 8),
           Text(
             'Digite seu e-mail cadastrado para receber um link de recuperação',
-            style: GoogleFonts.inter(
-              fontSize: 14,
-              color: Colors.grey[600],
-            ),
+            style: GoogleFonts.inter(fontSize: 14, color: Colors.grey[600]),
           ),
           const SizedBox(height: 32),
-          
+
           CustomInputField(
             controller: _emailController,
             label: 'E-mail',
@@ -147,25 +148,23 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
               return null;
             },
           ),
-          
+
           const SizedBox(height: 32),
-          
+
           GreenButton(
             text: 'ENVIAR LINK',
             onPressed: _handleForgotPassword,
             isLoading: _isLoading,
             icon: Icons.send,
           ),
-          
+
           const SizedBox(height: 16),
-          
+
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: const Text(
               'Voltar para o login',
-              style: TextStyle(
-                color: Color(0xFF2E7D32),
-              ),
+              style: TextStyle(color: Color(0xFF2E7D32)),
             ),
           ),
         ],
@@ -190,25 +189,19 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             fontWeight: FontWeight.bold,
             color: const Color(0xFF0F172A),
           ),
-          textAlign: TextAlign.center,  // ✅ CORRETO - fora do style
+          textAlign: TextAlign.center, // ✅ CORRETO - fora do style
         ),
         const SizedBox(height: 16),
         Text(
           'Enviamos um link de recuperação para:\n${_emailController.text}',
-          style: GoogleFonts.inter(
-            fontSize: 14,
-            color: Colors.grey[600],
-          ),
-          textAlign: TextAlign.center,  // ✅ CORRETO - fora do style
+          style: GoogleFonts.inter(fontSize: 14, color: Colors.grey[600]),
+          textAlign: TextAlign.center, // ✅ CORRETO - fora do style
         ),
         const SizedBox(height: 16),
         Text(
           'Verifique sua caixa de entrada e spam.',
-          style: GoogleFonts.inter(
-            fontSize: 12,
-            color: Colors.grey[500],
-          ),
-          textAlign: TextAlign.center,  // ✅ CORRETO - fora do style
+          style: GoogleFonts.inter(fontSize: 12, color: Colors.grey[500]),
+          textAlign: TextAlign.center, // ✅ CORRETO - fora do style
         ),
         const SizedBox(height: 32),
         GreenButton(

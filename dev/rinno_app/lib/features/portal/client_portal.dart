@@ -4,6 +4,7 @@ import '../../core/network/app_api.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/theme/widgets/glass_surface.dart';
 import 'client_home_page.dart';
+import 'privacy_page.dart';
 
 class ClientPortal extends StatefulWidget {
   final AppApi api;
@@ -336,6 +337,12 @@ class _LoginState extends State<_Login> {
                     color: AppTheme.muted,
                     fontSize: 12,
                     height: 1.7,
+                  ),
+                ),
+                Center(
+                  child: TextButton(
+                    onPressed: () => openPrivacy(context),
+                    child: const Text('Privacidade e dados'),
                   ),
                 ),
               ],

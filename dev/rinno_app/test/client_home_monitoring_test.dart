@@ -18,9 +18,10 @@ void main() {
       final api = AppApi(
         store: MemoryStore(),
         client: MockClient((request) async {
-          if (request.url.path.endsWith('/login'))
+          if (request.url.path.endsWith('/login')) {
             return jsonResponse(session('token'));
-          if (request.url.path.endsWith('/stages'))
+          }
+          if (request.url.path.endsWith('/stages')) {
             return jsonResponse({
               'items': [
                 {
@@ -32,6 +33,7 @@ void main() {
                 },
               ],
             });
+          }
           if (request.url.path.endsWith('/energy')) energyCalls++;
           if (request.url.path.endsWith('/monitoring')) {
             return jsonResponse({

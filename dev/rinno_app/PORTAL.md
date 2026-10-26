@@ -27,6 +27,16 @@ O padrão de `API_BASE_URL` já é essa URL. Em desenvolvimento Web, autorize a 
 
 O workflow `.github/workflows/client-platforms.yml` testa e compila cada alvo em seu sistema operacional. Seus artefatos não representam publicação nas lojas. Android usa APK de teste; configure uma chave de lançamento privada para gerar AAB de produção. iOS exige Apple Team/provisionamento. O identificador base é `br.com.rinnovare.app`; confirme sua disponibilidade nas contas das lojas antes da publicação.
 
+## Prévia móvel 1.0.0+2
+
+O workflow `.github/workflows/mobile-preview.yml` valida a branch `codex/app-rinnovare` em Linux/Android e macOS/iOS. Executa análise estática e testes, gera um APK debug e um aplicativo para simulador iOS, e verifica a compilação iOS de dispositivo sem assinatura. O resultado de cada execução deve ser conferido antes de distribuir o artefato.
+
+Para reproduzir Android: JDK 17, SDK Platform 36, Build Tools 36, NDK 28.2.13676358 e CMake 3.22.1. Execute `flutter pub get`, `dart analyze lib test`, `flutter test` e `flutter build apk --debug`. O APK fica em `build/app/outputs/flutter-apk/app-debug.apk`. Instale com `adb install -r caminho/do/app-debug.apk` ou arraste-o para o emulador. A prévia usa a API real e exige uma conta de cliente já vinculada no CRME; não contém contas ou senhas de demonstração.
+
+Ícones nativos são gerados por `dart run flutter_launcher_icons` usando `flutter_launcher_icons.yaml`. A abertura nativa usa o símbolo Rinnovare sobre azul escuro. A tela de privacidade fica acessível antes e depois do login e inclui o contato para correção ou exclusão de dados; não oferece uma exclusão automática que o backend ainda não implementa.
+
+Antes de publicar nas lojas: conferir identidade do desenvolvedor, assinatura Android, Apple Team e provisionamento; validar em dispositivos reais, preencher as declarações de privacidade/Dados de segurança conforme o tratamento efetivo dos dados e disponibilizar uma política pública e o procedimento de exclusão exigidos pela loja. A compilação de teste não substitui essas etapas.
+
 Para assinar Android, crie `android/key.properties` localmente com `storeFile` (caminho absoluto), `storePassword`, `keyAlias` e `keyPassword`. O arquivo e os keystores são ignorados pelo Git. Release nunca utiliza automaticamente a chave debug; sem a configuração, o artefato não estará assinado para distribuição.
 
 Os artefatos Linux/macOS/iOS contêm um `.tar.gz` dentro do ZIP do GitHub para preservar permissões de execução e links. Extraia primeiro o ZIP, depois o tar (`tar -xzf arquivo.tar.gz`). Windows deve manter o executável junto das DLLs e da pasta `data`; não copiar apenas o `.exe`.

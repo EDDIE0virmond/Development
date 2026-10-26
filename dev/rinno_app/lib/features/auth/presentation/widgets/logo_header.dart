@@ -27,17 +27,13 @@ class LogoHeader extends StatelessWidget {
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withValues(alpha: 0.05),
                   blurRadius: 10,
                   offset: const Offset(0, 5),
                 ),
               ],
             ),
-            child: const Icon(
-              Icons.eco,
-              size: 45,
-              color: Color(0xFF2E7D32),
-            ),
+            child: const Icon(Icons.eco, size: 45, color: Color(0xFF2E7D32)),
           ),
         if (showLogo) const SizedBox(height: 24),
         Text(
@@ -54,10 +50,7 @@ class LogoHeader extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             subtitle!,
-            style: GoogleFonts.inter(
-              fontSize: 14,
-              color: Colors.grey[600],
-            ),
+            style: GoogleFonts.inter(fontSize: 14, color: Colors.grey[600]),
             textAlign: TextAlign.center,
           ),
         ],

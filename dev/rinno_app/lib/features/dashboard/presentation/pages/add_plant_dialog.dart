@@ -6,17 +6,18 @@ import '../../../../core/models/simple_user.dart';
 
 class AddPlantDialog extends StatefulWidget {
   final Function(
-    int, 
-    String, 
-    String, 
-    double, 
+    int,
+    String,
+    String,
+    double,
     String,
     int,
     String,
     String,
     String,
     int,
-  ) onAdd;
+  )
+  onAdd;
 
   const AddPlantDialog({super.key, required this.onAdd});
 
@@ -30,14 +31,14 @@ class _AddPlantDialogState extends State<AddPlantDialog> {
   final _descricaoController = TextEditingController();
   final _potenciaController = TextEditingController();
   final _localizacaoController = TextEditingController();
-  
+
   final _quantidadePlacasController = TextEditingController();
   final _nomePlacaController = TextEditingController();
   final _nomeInversorController = TextEditingController();
   final _quantidadeInversoresController = TextEditingController();
-  
+
   String _tipoInversor = 'micro';
-  
+
   final UserService _userService = UserService();
   List<SimpleUser> _clientes = [];
   SimpleUser? _selectedCliente;
@@ -132,14 +133,11 @@ class _AddPlantDialogState extends State<AddPlantDialog> {
                 const SizedBox(height: 8),
                 Text(
                   'Selecione o cliente e preencha os dados da planta',
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: Colors.grey[600],
-                  ),
+                  style: TextStyle(fontSize: 13, color: Colors.grey[600]),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 24),
-                
+
                 // Seletor de cliente
                 Container(
                   decoration: BoxDecoration(
@@ -147,7 +145,10 @@ class _AddPlantDialogState extends State<AddPlantDialog> {
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(color: Colors.grey.shade200),
                   ),
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 4,
+                  ),
                   child: _isLoadingUsers
                       ? const Center(
                           child: Padding(
@@ -156,56 +157,56 @@ class _AddPlantDialogState extends State<AddPlantDialog> {
                           ),
                         )
                       : _clientes.isEmpty
-                          ? const Padding(
-                              padding: EdgeInsets.all(16),
-                              child: Text(
-                                'Nenhum cliente cadastrado',
-                                style: TextStyle(color: Colors.grey),
-                              ),
-                            )
-                          : DropdownButtonFormField<SimpleUser>(
-                              value: _selectedCliente,
-                              decoration: const InputDecoration(
-                                labelText: 'Selecionar Cliente',
-                                border: InputBorder.none,
-                                icon: Icon(Icons.person, color: Color(0xFF2E7D32)),
-                              ),
-                              items: _clientes.map((cliente) {
-                                return DropdownMenuItem<SimpleUser>(
-                                  value: cliente,
-                                  child: Container(
-                                    constraints: const BoxConstraints(
-                                      minHeight: 40,
-                                    ),
-                                    child: Align(
-                                      alignment: Alignment.centerLeft,
-                                      child: Text(
-                                        cliente.nome,
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 14,
-                                        ),
-                                      ),
+                      ? const Padding(
+                          padding: EdgeInsets.all(16),
+                          child: Text(
+                            'Nenhum cliente cadastrado',
+                            style: TextStyle(color: Colors.grey),
+                          ),
+                        )
+                      : DropdownButtonFormField<SimpleUser>(
+                          initialValue: _selectedCliente,
+                          decoration: const InputDecoration(
+                            labelText: 'Selecionar Cliente',
+                            border: InputBorder.none,
+                            icon: Icon(Icons.person, color: Color(0xFF2E7D32)),
+                          ),
+                          items: _clientes.map((cliente) {
+                            return DropdownMenuItem<SimpleUser>(
+                              value: cliente,
+                              child: Container(
+                                constraints: const BoxConstraints(
+                                  minHeight: 40,
+                                ),
+                                child: Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    cliente.nome,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 14,
                                     ),
                                   ),
-                                );
-                              }).toList(),
-                              onChanged: (value) {
-                                setState(() {
-                                  _selectedCliente = value;
-                                });
-                              },
-                              validator: (value) {
-                                if (value == null) {
-                                  return 'Selecione um cliente';
-                                }
-                                return null;
-                              },
-                            ),
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedCliente = value;
+                            });
+                          },
+                          validator: (value) {
+                            if (value == null) {
+                              return 'Selecione um cliente';
+                            }
+                            return null;
+                          },
+                        ),
                 ),
-                
+
                 const SizedBox(height: 16),
-                
+
                 // Nome da planta
                 TextFormField(
                   controller: _nomeController,
@@ -222,7 +223,7 @@ class _AddPlantDialogState extends State<AddPlantDialog> {
                   },
                 ),
                 const SizedBox(height: 16),
-                
+
                 // Descrição
                 TextFormField(
                   controller: _descricaoController,
@@ -240,7 +241,7 @@ class _AddPlantDialogState extends State<AddPlantDialog> {
                   },
                 ),
                 const SizedBox(height: 16),
-                
+
                 // Potência
                 TextFormField(
                   controller: _potenciaController,
@@ -261,7 +262,7 @@ class _AddPlantDialogState extends State<AddPlantDialog> {
                   },
                 ),
                 const SizedBox(height: 16),
-                
+
                 // Localização
                 TextFormField(
                   controller: _localizacaoController,
@@ -277,9 +278,9 @@ class _AddPlantDialogState extends State<AddPlantDialog> {
                     return null;
                   },
                 ),
-                
+
                 const Divider(height: 32),
-                
+
                 // SEÇÃO DE PLACAS
                 Row(
                   children: [
@@ -324,9 +325,9 @@ class _AddPlantDialogState extends State<AddPlantDialog> {
                     ),
                   ],
                 ),
-                
+
                 const SizedBox(height: 16),
-                
+
                 // SEÇÃO DE INVERSOR
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -341,12 +342,15 @@ class _AddPlantDialogState extends State<AddPlantDialog> {
                       ),
                       padding: const EdgeInsets.symmetric(horizontal: 4),
                       child: DropdownButtonFormField<String>(
-                        value: _tipoInversor,
+                        initialValue: _tipoInversor,
                         isDense: true,
                         decoration: const InputDecoration(
                           labelText: 'Tipo',
                           border: InputBorder.none,
-                          contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+                          contentPadding: EdgeInsets.symmetric(
+                            vertical: 8,
+                            horizontal: 4,
+                          ),
                         ),
                         items: _tiposInversor.map((tipo) {
                           return DropdownMenuItem<String>(
@@ -385,9 +389,9 @@ class _AddPlantDialogState extends State<AddPlantDialog> {
                     ),
                   ],
                 ),
-                
+
                 const SizedBox(height: 12),
-                
+
                 TextFormField(
                   controller: _quantidadeInversoresController,
                   decoration: const InputDecoration(
@@ -406,7 +410,7 @@ class _AddPlantDialogState extends State<AddPlantDialog> {
                     return null;
                   },
                 ),
-                
+
                 const SizedBox(height: 24),
                 Row(
                   children: [
