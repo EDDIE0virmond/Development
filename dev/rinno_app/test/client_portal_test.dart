@@ -97,10 +97,11 @@ void main() {
     await tester.pumpWidget(MyApp(api: api));
     await tester.pumpAndSettle();
     expect(find.text('SOL-001'), findsOneWidget);
-    await tester.ensureVisible(find.text('Ver instalação'));
-    await tester.tap(find.text('Ver instalação'));
-    await tester.pumpAndSettle();
     expect(find.text('Instalação dos módulos'), findsOneWidget);
+    await tester.ensureVisible(find.text('Detalhes e documentos'));
+    await tester.tap(find.text('Detalhes e documentos'));
+    await tester.pumpAndSettle();
+    expect(find.text('Etapas da instalação'), findsNothing);
     await tester.scrollUntilVisible(
       find.text('Manual do sistema.pdf'),
       300,

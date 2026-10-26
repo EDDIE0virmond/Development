@@ -20,6 +20,7 @@ void main() {
         client: MockClient((request) async {
           if (request.url.path.endsWith('/login'))
             return jsonResponse(session('token'));
+          if (request.url.path.endsWith('/stages')) return jsonResponse({'items':[{'id':'contrato','nome':'Contrato assinado','branch':'root','status':'pendente','previsao':'2026-11-15'}]});
           if (request.url.path.endsWith('/energy')) energyCalls++;
           if (request.url.path.endsWith('/monitoring')) {
             return jsonResponse({
@@ -62,12 +63,14 @@ void main() {
       if (linked) {
         expect(
           tester.getTopLeft(find.text('Monitoramento')).dy,
-          greaterThan(tester.getBottomLeft(find.text('Ver instalação')).dy),
+          greaterThan(tester.getBottomLeft(find.text('Detalhes e documentos')).dy),
         );
       }
+      expect(find.text('Contrato assinado'), findsOneWidget);
+      expect(find.textContaining('15/11/2026'), findsOneWidget);
       expect(energyCalls, linked ? 1 : 0);
       expect(tester.takeException(), isNull);
-      await tester.tap(find.text('Ver instalação'));
+      await tester.tap(find.text('Detalhes e documentos'));
       await tester.pumpAndSettle();
       expect(find.byType(Dialog), findsNothing);
       expect(find.text('Minha instalação'), findsOneWidget);

@@ -38,12 +38,15 @@ class InstallationPage {
 
 class InstallationStage {
   final String id, nome, status, branch;
-  final DateTime? dataConclusao;
+  final DateTime? dataConclusao, previsao;
+  final bool canComplete;
   InstallationStage.fromJson(Map<String, dynamic> json)
     : id = json['id'] as String,
       nome = json['nome'] as String,
       branch = json['branch'] as String? ?? 'finish',
       status = json['status'] as String,
+      canComplete = json['canComplete'] as bool? ?? true,
+      previsao = DateTime.tryParse(json['previsao'] as String? ?? ''),
       dataConclusao = DateTime.tryParse(json['dataConclusao'] as String? ?? '');
   bool get completed => status == 'concluida';
   String get label => switch (status) {

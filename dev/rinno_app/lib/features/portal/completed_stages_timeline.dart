@@ -4,14 +4,14 @@ import '../../core/models/installation.dart';
 const _accent = Color(0xff9adea9);
 const _connector = Color(0xff80bca0);
 
-/// Customer milestones remain read-only; pending milestones are never rendered.
+/// Full customer-facing graph; all completion and forecasts are CRM-only.
 class CompletedStagesTimeline extends StatelessWidget {
   final List<InstallationStage> stages;
   const CompletedStagesTimeline({super.key, required this.stages});
   @override
   Widget build(BuildContext context) {
-    final completed = stages.where((s) => s.completed).toList();
-    if (completed.isEmpty) {
+    final visible = stages;
+    if (visible.isEmpty) {
       return Row(
         children: [
           Container(
@@ -38,7 +38,7 @@ class CompletedStagesTimeline extends StatelessWidget {
                 ),
                 SizedBox(height: 5),
                 Text(
-                  'As etapas concluídas aparecerão aqui.',
+                  'O acompanhamento será disponibilizado em breve.',
                   style: TextStyle(
                     color: Color(0xffc3d1db),
                     height: 1.5,
@@ -51,10 +51,10 @@ class CompletedStagesTimeline extends StatelessWidget {
         ],
       );
     }
-    final roots = completed.where((s) => s.branch == 'root').toList();
-    final left = completed.where((s) => s.branch == 'documents').toList();
-    final right = completed.where((s) => s.branch == 'installation').toList();
-    final finish = completed.where((s) => s.branch == 'finish').toList();
+    final roots = visible.where((s) => s.branch == 'root').toList();
+    final left = visible.where((s) => s.branch == 'documents').toList();
+    final right = visible.where((s) => s.branch == 'installation').toList();
+    final finish = visible.where((s) => s.branch == 'finish').toList();
     final branches = left.isNotEmpty || right.isNotEmpty;
     Widget chain(List<InstallationStage> items) => Column(
       children: [
@@ -126,12 +126,14 @@ class _Node extends StatelessWidget {
   const _Node({required this.stage});
   @override
   Widget build(BuildContext context) {
-    final date = stage.dataConclusao?.toLocal();
+    final date = stage.completed
+        ? stage.dataConclusao?.toLocal()
+        : stage.previsao;
     final dateLabel = date == null
-        ? 'Concluída'
-        : '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
+        ? (stage.completed ? 'Concluída' : 'Previsão a confirmar')
+        : '${stage.completed ? 'Concluída em ' : 'Previsão: '}${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
     return Semantics(
-      label: '${stage.nome}, concluída, $dateLabel',
+      label: '${stage.nome}, ${stage.label}, $dateLabel',
       excludeSemantics: true,
       child: Container(
         width: double.infinity,
@@ -143,7 +145,11 @@ class _Node extends StatelessWidget {
             colors: [Color(0xff263e51), Color(0xff1c2d42)],
           ),
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.white.withValues(alpha: .17)),
+          border: Border.all(
+            color: stage.completed
+                ? _accent.withValues(alpha: .45)
+                : Colors.white.withValues(alpha: .17),
+          ),
           boxShadow: const [
             BoxShadow(
               color: Color(0x14040e20),
@@ -160,11 +166,16 @@ class _Node extends StatelessWidget {
               height: 30,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                gradient: const LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [Color(0xffb1edb4), Color(0xff78c99a)],
-                ),
+                gradient: stage.completed
+                    ? const LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [Color(0xffb1edb4), Color(0xff78c99a)],
+                      )
+                    : null,
+                color: stage.completed
+                    ? null
+                    : Colors.white.withValues(alpha: .09),
                 boxShadow: [
                   BoxShadow(
                     color: _accent.withValues(alpha: .08),
@@ -172,9 +183,11 @@ class _Node extends StatelessWidget {
                   ),
                 ],
               ),
-              child: const Icon(
-                Icons.check_rounded,
-                color: Color(0xff163d32),
+              child: Icon(
+                stage.completed ? Icons.check_rounded : Icons.schedule_rounded,
+                color: stage.completed
+                    ? const Color(0xff163d32)
+                    : const Color(0xffc3d1db),
                 size: 20,
               ),
             );
@@ -195,7 +208,7 @@ class _Node extends StatelessWidget {
                 ),
                 const SizedBox(height: 5),
                 Text(
-                  dateLabel,
+                  '${stage.completed ? '' : 'Pendente · '}$dateLabel',
                   textAlign: compact ? TextAlign.center : TextAlign.left,
                   style: const TextStyle(
                     color: Color(0xffb9cbd6),

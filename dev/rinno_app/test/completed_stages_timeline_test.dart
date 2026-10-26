@@ -7,43 +7,25 @@ InstallationStage stage(String name, String status) =>
     InstallationStage.fromJson({'id': name, 'nome': name, 'status': status});
 
 void main() {
-  testWidgets('only completed stages appear, preserving workflow order', (
-    tester,
-  ) async {
-    await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: CompletedStagesTimeline(
-            stages: [
-              stage('Primeira', 'concluida'),
-              stage('Pendente secreta', 'pendente'),
-              stage('Em andamento secreta', 'em_andamento'),
-              stage('Última', 'concluida'),
-              stage('Bloqueada secreta', 'bloqueada'),
-            ],
-          ),
-        ),
-      ),
-    );
-    expect(find.textContaining('secreta'), findsNothing);
-    expect(find.byIcon(Icons.check_rounded), findsNWidgets(2));
-    expect(
-      tester.getTopLeft(find.text('Primeira')).dy,
-      lessThan(tester.getTopLeft(find.text('Última')).dy),
-    );
+  testWidgets('full graph shows pending steps and forecasts without editing controls', (tester) async {
+    await tester.pumpWidget(MaterialApp(home: Scaffold(body: SingleChildScrollView(child: CompletedStagesTimeline(stages: [
+      stage('Primeira', 'concluida'),
+      InstallationStage.fromJson({'id':'proxima','nome':'Próxima etapa','status':'pendente','previsao':'2026-11-15'}),
+      stage('Última', 'pendente'),
+    ])))));
+    expect(find.text('Próxima etapa'), findsOneWidget);
+    expect(find.text('Última'), findsOneWidget);
+    expect(find.textContaining('15/11/2026'), findsOneWidget);
+    expect(find.byIcon(Icons.check_rounded), findsOneWidget);
+    expect(find.byIcon(Icons.schedule_rounded), findsNWidgets(2));
+    expect(find.byType(Checkbox), findsNothing);
+    expect(find.byType(TextField), findsNothing);
+    expect(tester.getTopLeft(find.text('Primeira')).dy, lessThan(tester.getTopLeft(find.text('Última')).dy));
     expect(tester.takeException(), isNull);
   });
-
-  testWidgets('empty history does not disclose future stages', (tester) async {
-    await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: CompletedStagesTimeline(stages: [stage('Futura', 'pendente')]),
-        ),
-      ),
-    );
-    expect(find.text('Futura'), findsNothing);
-    expect(find.text('As etapas concluídas aparecerão aqui.'), findsOneWidget);
+  testWidgets('empty catalog has a helpful fallback', (tester) async {
+    await tester.pumpWidget(const MaterialApp(home: Scaffold(body: CompletedStagesTimeline(stages: []))));
+    expect(find.text('O acompanhamento será disponibilizado em breve.'), findsOneWidget);
     expect(find.byIcon(Icons.check_rounded), findsNothing);
   });
   for (final width in [320.0, 390.0, 768.0, 1280.0]) {
@@ -62,7 +44,7 @@ void main() {
                 ['Projeto aprovado', 'documents'],
                 ['Compra de material', 'installation'],
                 ['Chegada de material', 'installation'],
-                ['Agendamento', 'installation'],
+                ['Agendamento da Instalação', 'installation'],
                 ['Instalação', 'installation'],
                 ['Vistoria Neoenergia', 'finish'],
                 ['Sistema pronto', 'finish'],
@@ -72,7 +54,8 @@ void main() {
                   'id': s[0],
                   'nome': s[0],
                   'branch': s[1],
-                  'status': 'concluida',
+                  'status': s[0]=='Contrato assinado'?'concluida':'pendente',
+                  'previsao': '2026-11-15',
                 }),
               )
               .toList();
@@ -89,8 +72,9 @@ void main() {
         ),
       );
       expect(tester.takeException(), isNull);
-      expect(find.byIcon(Icons.check_rounded), findsNWidgets(10));
+      expect(find.byIcon(Icons.check_rounded), findsOneWidget);
       expect(find.byType(Checkbox), findsNothing);
+      expect(find.byIcon(Icons.schedule_rounded), findsNWidgets(9));
       expect(
         tester.getTopLeft(find.text('Solicitação de documentos')).dx,
         lessThan(tester.getTopLeft(find.text('Compra de material')).dx),
