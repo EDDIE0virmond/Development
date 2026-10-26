@@ -77,7 +77,12 @@ class _ClientHomePageState extends State<ClientHomePage> {
             final data = snapshot.data!;
             final items = [...previous, ...data.items];
             return SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(24, 24, 24, 40),
+              padding: EdgeInsets.fromLTRB(
+                MediaQuery.sizeOf(context).width < 600 ? 16 : 24,
+                24,
+                MediaQuery.sizeOf(context).width < 600 ? 16 : 24,
+                40,
+              ),
               child: Center(
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 1100),
@@ -140,9 +145,14 @@ class _ClientHomePageState extends State<ClientHomePage> {
                       const SizedBox(height: 36),
                       Text(
                         'Minhas instalações',
-                        style: Theme.of(context).textTheme.headlineSmall,
+                        style: Theme.of(context).textTheme.headlineMedium,
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 10),
+                      const Text(
+                        'Acompanhe as etapas e previsões da sua instalação. Acesse os detalhes e documentos ao final do card.',
+                        style: TextStyle(color: AppTheme.muted),
+                      ),
+                      const SizedBox(height: 24),
                       if (items.isEmpty)
                         const GlassSurface(
                           child: Text(
@@ -167,7 +177,7 @@ class _ClientHomePageState extends State<ClientHomePage> {
                                 child: Padding(
                                   padding: EdgeInsets.all(
                                     MediaQuery.sizeOf(context).width < 600
-                                        ? 16
+                                        ? 12
                                         : 24,
                                   ),
                                   child: Column(
@@ -183,23 +193,33 @@ class _ClientHomePageState extends State<ClientHomePage> {
                                           const SizedBox(width: 12),
                                           Expanded(
                                             child: Text(
-                                              item.codigo,
+                                              item.nome.isEmpty
+                                                  ? item.codigo
+                                                  : '${item.codigo} · ${item.nome}',
                                               style: Theme.of(
                                                 context,
                                               ).textTheme.titleLarge,
                                             ),
                                           ),
-                                          IconButton(
-                                            tooltip: 'Detalhes e documentos',
-                                            onPressed: () =>
-                                                openProject(item.id),
-                                            icon: const Icon(
-                                              Icons.chevron_right,
-                                            ),
-                                          ),
                                         ],
                                       ),
-                                      const SizedBox(height: 16),
+                                      const SizedBox(height: 20),
+                                      Text(
+                                        'Acompanhamento da instalação',
+                                        style: Theme.of(
+                                          context,
+                                        ).textTheme.titleMedium,
+                                      ),
+                                      const SizedBox(height: 20),
+                                      _ProjectProgress(
+                                        key: ValueKey(item.id),
+                                        api: widget.api,
+                                        id: item.id,
+                                      ),
+                                      const Divider(
+                                        height: 32,
+                                        color: Color(0x33ffffff),
+                                      ),
                                       Text(
                                         item.statusLabel,
                                         style: const TextStyle(
@@ -230,22 +250,6 @@ class _ClientHomePageState extends State<ClientHomePage> {
                                             'Detalhes e documentos',
                                           ),
                                         ),
-                                      ),
-                                      const Divider(
-                                        height: 32,
-                                        color: Color(0x33ffffff),
-                                      ),
-                                      Text(
-                                        'Acompanhamento da instalação',
-                                        style: Theme.of(
-                                          context,
-                                        ).textTheme.titleMedium,
-                                      ),
-                                      const SizedBox(height: 20),
-                                      _ProjectProgress(
-                                        key: ValueKey(item.id),
-                                        api: widget.api,
-                                        id: item.id,
                                       ),
                                     ],
                                   ),

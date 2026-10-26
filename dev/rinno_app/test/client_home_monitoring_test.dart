@@ -20,7 +20,18 @@ void main() {
         client: MockClient((request) async {
           if (request.url.path.endsWith('/login'))
             return jsonResponse(session('token'));
-          if (request.url.path.endsWith('/stages')) return jsonResponse({'items':[{'id':'contrato','nome':'Contrato assinado','branch':'root','status':'pendente','previsao':'2026-11-15'}]});
+          if (request.url.path.endsWith('/stages'))
+            return jsonResponse({
+              'items': [
+                {
+                  'id': 'contrato',
+                  'nome': 'Contrato assinado',
+                  'branch': 'root',
+                  'status': 'pendente',
+                  'previsao': '2026-11-15',
+                },
+              ],
+            });
           if (request.url.path.endsWith('/energy')) energyCalls++;
           if (request.url.path.endsWith('/monitoring')) {
             return jsonResponse({
@@ -40,6 +51,7 @@ void main() {
               {
                 'id': 'installation',
                 'codigo': 'SOL-001',
+                'nome': 'Residência Solar',
                 'status': 'instalacao',
               },
             ],
@@ -63,13 +75,27 @@ void main() {
       if (linked) {
         expect(
           tester.getTopLeft(find.text('Monitoramento')).dy,
-          greaterThan(tester.getBottomLeft(find.text('Detalhes e documentos')).dy),
+          greaterThan(
+            tester.getBottomLeft(find.text('Detalhes e documentos')).dy,
+          ),
+        );
+      }
+      expect(find.text('SOL-001 · Residência Solar'), findsOneWidget);
+      expect(
+        tester.getTopLeft(find.text('Contrato assinado')).dy,
+        lessThan(tester.getTopLeft(find.text('Potência do sistema')).dy),
+      );
+      if (linked) {
+        expect(
+          tester.widget<Text>(find.text('Minhas instalações')).style,
+          tester.widget<Text>(find.text('Monitoramento')).style,
         );
       }
       expect(find.text('Contrato assinado'), findsOneWidget);
       expect(find.textContaining('15/11/2026'), findsOneWidget);
       expect(energyCalls, linked ? 1 : 0);
       expect(tester.takeException(), isNull);
+      await tester.ensureVisible(find.text('Detalhes e documentos'));
       await tester.tap(find.text('Detalhes e documentos'));
       await tester.pumpAndSettle();
       expect(find.byType(Dialog), findsNothing);

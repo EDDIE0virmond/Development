@@ -3,6 +3,7 @@ import '../../core/models/installation.dart';
 
 const _accent = Color(0xff9adea9);
 const _connector = Color(0xff80bca0);
+const _branchGap = 12.0;
 
 /// Full customer-facing graph; all completion and forecasts are CRM-only.
 class CompletedStagesTimeline extends StatelessWidget {
@@ -99,7 +100,7 @@ class CompletedStagesTimeline extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       Expanded(child: branchChain(left)),
-                      const SizedBox(width: 20),
+                      const SizedBox(width: _branchGap),
                       Expanded(child: branchChain(right)),
                     ],
                   ),
@@ -137,7 +138,10 @@ class _Node extends StatelessWidget {
       excludeSemantics: true,
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+        padding: EdgeInsets.symmetric(
+          horizontal: MediaQuery.sizeOf(context).width < 600 ? 8 : 12,
+          vertical: 16,
+        ),
         decoration: BoxDecoration(
           gradient: const LinearGradient(
             begin: Alignment.topLeft,
@@ -201,18 +205,21 @@ class _Node extends StatelessWidget {
                   textAlign: compact ? TextAlign.center : TextAlign.left,
                   style: const TextStyle(
                     color: Color(0xfff5fafc),
-                    fontSize: 13,
+                    fontSize: 14,
                     height: 1.45,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 const SizedBox(height: 5),
                 Text(
-                  '${stage.completed ? '' : 'Pendente · '}$dateLabel',
+                  dateLabel.replaceFirst(
+                    stage.completed ? 'Concluída em ' : 'Previsão: ',
+                    stage.completed ? 'Concluída em\n' : 'Previsão\n',
+                  ),
                   textAlign: compact ? TextAlign.center : TextAlign.left,
                   style: const TextStyle(
-                    color: Color(0xffb9cbd6),
-                    fontSize: 11,
+                    color: Color(0xffd1dfe8),
+                    fontSize: 12,
                     height: 1.4,
                   ),
                 ),
@@ -271,8 +278,8 @@ class _JunctionPainter extends CustomPainter {
     final center = size.width / 2;
     final paths = <Path>[];
     for (final x in [
-      if (left) (size.width - 20) / 4,
-      if (right) size.width - (size.width - 20) / 4,
+      if (left) (size.width - _branchGap) / 4,
+      if (right) size.width - (size.width - _branchGap) / 4,
     ]) {
       final start = merge ? x : center, end = merge ? center : x;
       paths.add(

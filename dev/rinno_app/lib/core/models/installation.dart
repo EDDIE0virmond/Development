@@ -1,5 +1,5 @@
 class Installation {
-  final String id, codigo, status;
+  final String id, codigo, nome, status;
   final double potenciaKwp;
   final int quantidadeModulos, quantidadeInversores;
   final String modeloModulos, modeloInversores;
@@ -7,6 +7,7 @@ class Installation {
   Installation.fromJson(Map<String, dynamic> json)
     : id = json['id'] as String,
       codigo = json['codigo'] as String? ?? 'Instalação solar',
+      nome = (json['nome'] as String? ?? '').trim(),
       status = json['status'] as String? ?? '',
       potenciaKwp = (json['potenciaKwp'] as num?)?.toDouble() ?? 0,
       quantidadeModulos = json['quantidadeModulos'] as int? ?? 0,
